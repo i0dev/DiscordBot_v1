@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Client_FactionsServerBotWhatWalls:jar">
+    <output-path>$PROJECT_DIR$/../../i0dev.com/Clientel/WhatWallsServerBot</output-path>
+    <root id="archive" name="Client_FactionsServerBotWhatWalls.jar">
+      <element id="module-output" name="Client_FactionsServerBotWhatWalls" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../Dependencies and Resources/java-json.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../Dependencies and Resources/JDA-4.1.1_149-withDependencies.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../Dependencies and Resources/json-simple-1.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
