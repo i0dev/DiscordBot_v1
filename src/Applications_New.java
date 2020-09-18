@@ -33,14 +33,8 @@ public class Applications_New extends ListenerAdapter {
     private int CurrentQuestion;
     private ArrayList<String> responses;
 
-    int SecondsPassed = 0;
+    public int SecondsPassed = 0;
 
-
-    public Applications_New() {
-        this.userID = "";
-        this.CurrentQuestion = -1;
-        this.responses = new ArrayList<String>();
-    }
 
     @Override
     public void onGuildMessageReceived(final GuildMessageReceivedEvent e) {
@@ -150,7 +144,7 @@ public class Applications_New extends ListenerAdapter {
                 this.userID = e.getAuthor().getId();
                 EmbedRules.setTitle("On-Going Application");
                 EmbedRules.setDescription("**Hey " + e.getMember().getUser().getAsTag() + ", Someone is already creating a ticket, Their app" +
-                        " will expire in `" + (Bot.ApplicationTimeoutTimeSECONDS-SecondsPassed) + "` seconds, if they do not answer a question within that time.**");
+                        " will expire in `" + (Bot.ApplicationTimeoutTimeSECONDS - SecondsPassed) + "` seconds, if they do not answer a question within that time.**");
                 EmbedRules.setColor(Color);
                 EmbedRules.setTimestamp(Bot.now);
                 EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);

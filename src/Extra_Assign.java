@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @SuppressWarnings("unused")
-public class Extra_Promote extends ListenerAdapter {
+public class Extra_Assign extends ListenerAdapter {
     public String BotPrefix = Bot.BotPrefix;
     public String BotName = Bot.BotName;
     public ZonedDateTime LocalTime = ZonedDateTime.now();
@@ -65,12 +65,12 @@ public class Extra_Promote extends ListenerAdapter {
                 e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
             isAllowed = true;
         }
-        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "promote")) {
+        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "assign")) {
             if (isAllowed) {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
                 EmbedRules.setTitle("Incorrect Format");
                 EmbedRules.setColor(Color);
-                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "promote [@User] <-s>", false);
+                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "assign [@User] [@Role] <-s>", false);
                 EmbedRules.setTimestamp(now);
                 EmbedRules.setFooter(Bot.WaterMark, BotLogo);
                 channel.sendMessage(EmbedRules.build()).queue(message1 -> {
@@ -88,12 +88,12 @@ public class Extra_Promote extends ListenerAdapter {
                 });
             }
         }
-        if (message.length == 999 && message[0].equalsIgnoreCase(Bot.BotPrefix + "promote")) {
+        if (message.length == 2 && message[0].equalsIgnoreCase(Bot.BotPrefix + "assign")) {
             if (isAllowed) {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
                 EmbedRules.setTitle("Incorrect Format");
                 EmbedRules.setColor(Color);
-                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "promote [@User] <-s>", false);
+                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "assign [@User] [@Role] <-s>", false);
                 EmbedRules.setTimestamp(now);
                 EmbedRules.setFooter(Bot.WaterMark, BotLogo);
                 channel.sendMessage(EmbedRules.build()).queue(message1 -> {
@@ -111,32 +111,33 @@ public class Extra_Promote extends ListenerAdapter {
                 });
             }
         }
-        if ((message.length == 2 || message.length == 3) && message[0].equalsIgnoreCase(Bot.BotPrefix + "promote") && e.getMessage().getMentionedRoles().size() == 0) {
+        if ((message.length == 3 || message.length == 4) && message[0].equalsIgnoreCase(Bot.BotPrefix + "assign")) {
             if (isAllowed) {
                 if (e.getMessage().getContentRaw().contains(" -s")) {
                     User MentionedUser = e.getMessage().getMentionedUsers().get(0);
                     Member MentionedMember = e.getMessage().getMentionedMembers().get(0);
-                    Role Position = null;
+                    Role Position = e.getMessage().getMentionedRoles().get(0);
+                    Role Position2 = null;
                     boolean isCurrentlyStaff = false;
                     for (int i = 0; i < StaffRoleIDS.size(); i++) {
                         if (MentionedMember.getRoles().contains(e.getGuild().getRoleById(StaffRoleIDS.get(i)))) {
-                            Position = e.getGuild().getRoleById(StaffRoleIDS.get(i + 1));
+                            Position2 = e.getGuild().getRoleById(StaffRoleIDS.get(i + 1));
                             isCurrentlyStaff = true;
-                            e.getGuild().addRoleToMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i + 1))).queue();
+                            e.getGuild().addRoleToMember(MentionedMember, Position).queue();
+                            e.getGuild().addRoleToMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
                             e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i))).queue();
                         }
                     }
                     if (!isCurrentlyStaff) {
-                        e.getGuild().addRoleToMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(0))).queue();
+                        e.getGuild().addRoleToMember(MentionedMember, Position).queue();
                         e.getGuild().addRoleToMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
-                        Position = e.getGuild().getRoleById(StaffRoleIDS.get(0));
+                        Position2 = e.getGuild().getRoleById(StaffRoleIDS.get(0));
                     }
 
-
                     EmbedBuilder EmbedRules = new EmbedBuilder();
-                    EmbedRules.setTitle("Successfully Promoted " + MentionedUser.getAsTag());
+                    EmbedRules.setTitle("Successfully Assigned " + MentionedUser.getAsTag());
                     EmbedRules.setColor(Color);
-                    EmbedRules.addField("Success", e.getMember().getUser().getAsTag() + ", you have __*Silently*__ promoted **" + MentionedMember.getUser().getAsTag() + "** to **" + Position.getAsMention() + "**", false);
+                    EmbedRules.addField("Success", e.getMember().getUser().getAsTag() + ", you have __*Silently*__ assigned **" + MentionedMember.getUser().getAsTag() + "** to **" + Position.getAsMention() + "**", false);
                     EmbedRules.setTimestamp(now);
                     EmbedRules.setFooter(Bot.WaterMark, BotLogo);
                     channel.sendMessage(EmbedRules.build()).queue(message1 -> {
@@ -146,25 +147,14 @@ public class Extra_Promote extends ListenerAdapter {
 
                     User MentionedUser = e.getMessage().getMentionedUsers().get(0);
                     Member MentionedMember = e.getMessage().getMentionedMembers().get(0);
-                    Role Position = null;
-                    boolean isCurrentlyStaff = false;
-                    for (int i = 0; i < StaffRoleIDS.size(); i++) {
-                        if (MentionedMember.getRoles().contains(e.getGuild().getRoleById(StaffRoleIDS.get(i)))) {
-                            Position = e.getGuild().getRoleById(StaffRoleIDS.get(i + 1));
-                            isCurrentlyStaff = true;
-                            e.getGuild().addRoleToMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i + 1))).queue();
-                            e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i))).queue();
-                        }
-                    }
-                    if (!isCurrentlyStaff) {
-                        e.getGuild().addRoleToMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(0))).queue();
-                        e.getGuild().addRoleToMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
-                        Position = e.getGuild().getRoleById(StaffRoleIDS.get(0));
-                    }
+                    Role Position = e.getMessage().getMentionedRoles().get(0);
+
+                    e.getGuild().addRoleToMember(MentionedMember, Position).queue();
+
                     EmbedBuilder EmbedRules = new EmbedBuilder();
-                    EmbedRules.setTitle("Successfully Promoted " + MentionedUser.getAsTag());
+                    EmbedRules.setTitle("Successfully Assigned " + MentionedUser.getAsTag());
                     EmbedRules.setColor(Color);
-                    EmbedRules.addField("Success", e.getMember().getUser().getAsTag() + ", you have promoted **" + MentionedMember.getUser().getAsTag() + "** to **" + Position.getAsMention() + "**", false);
+                    EmbedRules.addField("Success", e.getMember().getUser().getAsTag() + ", you have assigned **" + MentionedMember.getUser().getAsTag() + "** to **" + Position.getAsMention() + "**", false);
 
                     EmbedRules.setTimestamp(now);
                     EmbedRules.setFooter(Bot.WaterMark, BotLogo);
@@ -174,7 +164,7 @@ public class Extra_Promote extends ListenerAdapter {
                     EmbedBuilder Embed = new EmbedBuilder()
                             .setTitle("Incoming Staff Movement!")
                             .setColor(Color)
-                            .addField("Promotion", MentionedMember.getUser().getAsTag() + " has been promoted to **" + Position.getAsMention() + "** by " + e.getAuthor().getAsTag(), false)
+                            .addField("Assignation", MentionedMember.getUser().getAsTag() + " has been assigned to **" + Position.getAsMention() + "** by " + e.getAuthor().getAsTag(), false)
                             .setTimestamp(now)
                             .setFooter(Bot.WaterMark, BotLogo);
                     e.getGuild().getTextChannelById(StaffMovementsChannelID).sendMessage(Embed.build()).queue(message1 -> {

@@ -77,7 +77,8 @@ public class TEST_Help extends ListenerAdapter {
                             ":one: » **Basic Commands**\n" +
                             ":two: » **Moderation Commands**\n" +
                             ":three: » **Ticket Commands**\n" +
-                            ":four: » **Application Commands**\n");
+                            ":four: » **Application Commands**\n" +
+                            ":five: » **Fun Commands**\n");
 
 
             EmbedRules.setColor(Color);
@@ -89,6 +90,7 @@ public class TEST_Help extends ListenerAdapter {
                 message1.addReaction("2️⃣").queue();
                 message1.addReaction("3️⃣").queue();
                 message1.addReaction("4️⃣").queue();
+                message1.addReaction("5️⃣").queue();
                 HelpMessageID = message1.getId();
             });
             Timer myTimer = new Timer();
@@ -149,12 +151,13 @@ public class TEST_Help extends ListenerAdapter {
             });
             SecondsPassed = 0;
         }
-        if (e.getReactionEmote().getName().equals("2️⃣") && e.getMessageId().equals(HelpMessageID) && !e.getUser().isBot()) {
+        if ((e.getReactionEmote().getName().equals("2️⃣") || e.getReactionEmote().getName().equals("◀️")) && e.getMessageId().equals(HelpMessageID) && !e.getUser().isBot()) {
             SecondsPassed = 0;
             EmbedBuilder Embed2 = new EmbedBuilder()
                     .setColor(Color)
-                    .setTitle("Moderation Commands Help Page")
-                    .setDescription("React with :arrow_left: to return to the main help menu")
+                    .setTitle("Moderation Commands Help Page 1")
+                    .setDescription("React with :arrow_left: to return to the main help menu\n" +
+                            "React with ▶️️ to go to page 2 for Moderation")
                     .addField("",
 
                             "**" + Bot.BotPrefix + "ban** [user] > Bans the user.\n" +
@@ -166,13 +169,7 @@ public class TEST_Help extends ListenerAdapter {
                                     "**" + Bot.BotPrefix + "unmute** [user] [reason] > unmutes the user.\n" +
                                     "**" + Bot.BotPrefix + "announce** [#channel] [announcement] > sends an announcement to that channel\n" +
                                     "**" + Bot.BotPrefix + "say** [#channel] [announcement] > sends a silent-announcement to that channel\n" +
-                                    "**" + Bot.BotPrefix + "getMuted** > Gets all muted users\n" +
-                                    "**" + BotPrefix + "Warn [@User] [Warning] ** **→** Warns the user.\n" +
-                                    "**" + BotPrefix + "getWarns [@User] ** **→** Gets the users warn count.\n" +
-                                    "**" + BotPrefix + "Promote [@User] [@Role] <-s>** **→** Promotes that user \n" +
-                                    "**" + BotPrefix + "Demote [@User] <-s>** **→** Demotes that user and clears their staff roles\n" +
-                                    "**" + BotPrefix + "Resign [@User] <-s>** **→** Resigns that user and clears their staff roles\n" +
-                                    "**" + BotPrefix + "FacLeader [@User]** **→** Gives that user Faction Leader Role\n"
+                                    "**" + Bot.BotPrefix + "getMuted** > Gets all muted users\n"
 
 
                             , false)
@@ -182,6 +179,38 @@ public class TEST_Help extends ListenerAdapter {
             SecondsPassed = 0;
             e.getChannel().editMessageById(HelpMessageID, Embed2.build()).queue(message69 -> {
                 message69.addReaction("⬅️").queue();
+                message69.addReaction("▶️").queue();
+            });
+
+        }
+        if (e.getReactionEmote().getName().equals("▶️") && e.getMessageId().equals(HelpMessageID) && !e.getUser().isBot()) {
+            SecondsPassed = 0;
+            EmbedBuilder Embed2 = new EmbedBuilder()
+                    .setColor(Color)
+                    .setTitle("Moderation Commands Help Page 2")
+                    .setDescription("React with :arrow_left: to return to the main help menu\n" +
+                            "React with ◀️️️ to go to page 1 for Moderation")
+
+                    .addField("",
+                            "**" + BotPrefix + "Warn [@User] [Warning] ** **→** Warns the user.\n" +
+                                    "**" + BotPrefix + "getWarns [@User] ** **→** Gets the users warn count.\n" +
+                                    "**" + BotPrefix + "Promote [@User] <-s>** **→** Promotes that user to the next rank.\n" +
+                                    "**" + BotPrefix + "Assign [@User] [@Role] <-s>** **→** Assigns that user a role\n" +
+                                    "**" + BotPrefix + "Demote [@User] <-s>** **→** Demotes that user to the next lowest rank.\n" +
+                                    "**" + BotPrefix + "StaffClear [@User] <-s>** **→** Demotes that user and clears their staff roles\n" +
+                                    "**" + BotPrefix + "Resign [@User] <-s>** **→** Resigns that user and clears their staff roles\n" +
+                                    "**" + BotPrefix + "FacLeader [@User]** **→** Gives that user Faction Leader Role\n" +
+                                    "**" + BotPrefix + "Confirm [@Leader] [Faction Name] [Roster Size]** **→** Confirms that faction as playing\n" +
+                                    "**" + BotPrefix + "Poll [Number Of Options]** **→** Starts the Poll-Creator in DMS\n"
+
+
+                            , false)
+                    .setTimestamp(LocalTime)
+                    .setFooter(BotName, BotLogo);
+            e.getChannel().clearReactionsById(HelpMessageID).queue();
+            e.getChannel().editMessageById(HelpMessageID, Embed2.build()).queue(message69 -> {
+                message69.addReaction("⬅️").queue();
+                message69.addReaction("◀️").queue();
             });
 
         }
@@ -230,6 +259,27 @@ public class TEST_Help extends ListenerAdapter {
                 message69.addReaction("⬅️").queue();
             });
         }
+        if (e.getReactionEmote().getName().equals("5️⃣") && e.getMessageId().equals(HelpMessageID) && !e.getUser().isBot()) {
+
+            EmbedBuilder Embed = new EmbedBuilder()
+                    .setColor(Color)
+                    .setTitle("Fun Commands Help Page")
+                    .setDescription("React with :arrow_left: to return to the main help menu")
+                    .addField("",
+                            "**" + BotPrefix + "Slap [@User]** **→** Slaps them!\n" +
+                                    "**" + BotPrefix + "Pat [@User]** **→** Pats them!\n" +
+                                    "**" + BotPrefix + "hi** **→** Says Hello back!\n" +
+                                    "**" + BotPrefix + "Dice** **→** Rolls a die!\n" +
+                                    "**" + BotPrefix + "cf** **→** Flips a coin!\n"
+                            , false)
+                    .setTimestamp(LocalTime)
+                    .setFooter(BotName, BotLogo);
+            e.getChannel().clearReactionsById(HelpMessageID).queue();
+            SecondsPassed = 0;
+            e.getChannel().editMessageById(HelpMessageID, Embed.build()).queue(message69 -> {
+                message69.addReaction("⬅️").queue();
+            });
+        }
         if (e.getReactionEmote().getName().equals("⬅️") && e.getMessageId().equals(HelpMessageID) && !e.getUser().isBot()) {
 
             EmbedBuilder EmbedRules = new EmbedBuilder();
@@ -241,7 +291,9 @@ public class TEST_Help extends ListenerAdapter {
                             ":one: » **Basic Commands**\n" +
                             ":two: » **Moderation Commands**\n" +
                             ":three: » **Ticket Commands**\n" +
-                            ":four: » **Application Commands**\n");
+                            ":four: » **Application Commands**\n" +
+                            ":five: » **Fun Commands**\n");
+
             EmbedRules.setTimestamp(LocalTime);
             EmbedRules.setFooter("", BotLogo);
             e.getChannel().clearReactionsById(HelpMessageID).queue();
@@ -251,6 +303,7 @@ public class TEST_Help extends ListenerAdapter {
                 message1.addReaction("2️⃣").queue();
                 message1.addReaction("3️⃣").queue();
                 message1.addReaction("4️⃣").queue();
+                message1.addReaction("5️⃣").queue();
 
             });
 

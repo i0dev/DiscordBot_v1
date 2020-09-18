@@ -43,8 +43,8 @@ public class Extra_Verify extends ListenerAdapter {
                 e.getChannel().getHistoryFromBeginning(100).complete().getMessageById(e.getMessageId())
                         .removeReaction("✅", e.getUser()).complete();
 
-                e.getGuild().addRoleToMember(e.getMember().getId(), e.getGuild().getRoleById(Bot.Verify_RoleToGiveID)).queue();
-
+                e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById(Bot.Verify_RoleToGiveID)).queue();
+                e.getGuild().removeRoleFromMember(e.getMember(), e.getGuild().getRoleById(Bot.VisitorRoleID)).queue();
                 MessageChannel privateDM = e.getMember().getUser().openPrivateChannel().complete();
                 EmbedBuilder Embed = new EmbedBuilder()
                         .setTitle(Bot.BotName + " Verification")

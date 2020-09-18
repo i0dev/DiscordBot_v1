@@ -24,7 +24,7 @@ public class Bot {
     public static JDA jda;
 
     public static long ApplicationTimeoutTimeSECONDS = 300;
-
+    public static String ConfirmedFactionChannelID = "";
     public static String ColorHexCode = "#d66058";
     public static String BotLogo = "";
     public static String BotToken = "";
@@ -63,6 +63,7 @@ public class Bot {
 
     public static String SupportTeamRoleID = "";
     public static String AdminRoleID = "";
+    public static ArrayList<String> ApplicationQuestions = new ArrayList<>();
     public static String MemberRoleID = "";
 
     public static String[] BlockedWordsList = {"nigger", "Faggot", "n1gger", "n1g3r", "nigga", "n1gga", "niga"};
@@ -138,7 +139,7 @@ public class Bot {
             e.printStackTrace();
         }
 
-        jda.addEventListener(new Applications_New());
+      //  jda.addEventListener(new Applications_New());
         jda.addEventListener(new Application_Accept());
         jda.addEventListener(new Application_Deny());
         jda.addEventListener(new Application_Review());
@@ -200,7 +201,17 @@ public class Bot {
 
         jda.addEventListener(new TEST_Apps());
         jda.addEventListener(new TEST_Help());
-        jda.addEventListener(new Extra_StaffClear() );
+        jda.addEventListener(new Extra_Assign());
+        jda.addEventListener(new Extra_StaffClear());
+        jda.addEventListener(new Extra_Confirm());
+
+        jda.addEventListener(new Fun_Slap());
+        jda.addEventListener(new Fun_8Ball());
+        jda.addEventListener(new Fun_CoinFlip());
+        jda.addEventListener(new Fun_Dice());
+        jda.addEventListener(new Fun_Hi());
+        jda.addEventListener(new Fun_Pat());
+        jda.addEventListener(new TEST_Polls());
 
     }
 
@@ -297,6 +308,7 @@ public class Bot {
         ChannelIDS.put("SuggestionChannelID", "751860128055165008");
         ChannelIDS.put("StaffMovementsChannelID", "751873062026346506");
         ChannelIDS.put("AdminLogsChannelID", "744580384423149734");
+        ChannelIDS.put("ConfirmedFactionChannelID", "756166636402245763");
         ChannelIDS.put("BugReportChannelID", "751876990763794593");
         ChannelIDS.put("TicketCreateChannelID", "743324430067040396");
         ChannelIDS.put("TicketCreateCategoryChannelID", "744580337010475099");
@@ -318,6 +330,12 @@ public class Bot {
         GeneralConfig.put("BotLogo", "https://cdn.discordapp.com/attachments/667207717882036234/746181096995291156/i01.png");
         GeneralConfig.put("ColorHexCode", "#4287f5");
         GeneralConfig.put("TicketCount", 0);
+        ArrayList<String> AppQuestionsDefault = new ArrayList<String>();
+        AppQuestionsDefault.add("What is your age");
+        AppQuestionsDefault.add("What is your name");
+        AppQuestionsDefault.add("What is your IGN");
+        AppQuestionsDefault.add("What is your Favorite Candy");
+        GeneralConfig.put("StaffRoleIDS", AppQuestionsDefault);
         ArrayList<String> AllowedRolesDEFAULT = new ArrayList<String>();
 
         JSONObject Extras = new JSONObject();
@@ -376,6 +394,8 @@ public class Bot {
             JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/config.json")));
 
             SupportTeamRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("SupportTeamRoleID");
+            ConfirmedFactionChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("ConfirmedFactionChannelID");
+            ApplicationQuestions = ((HashMap<String, ArrayList>) json.get("GeneralConfig")).get("ApplicationQuestions");
         } catch (Exception e) {
             e.printStackTrace();
         }

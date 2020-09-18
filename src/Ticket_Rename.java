@@ -9,6 +9,7 @@ import org.json.simple.parser.JSONParser;
 
 import java.io.File;
 import java.io.FileReader;
+import java.net.IDN;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
@@ -124,22 +125,47 @@ public class Ticket_Rename extends ListenerAdapter {
                 }
                 String newTicketName = "";
 
-                for (int i = 1; i< messageWithSplit.length;i++) {
-                    newTicketName+= messageWithSplit[i]+"-";
+
+                for (int i = 1; i < messageWithSplit.length; i++) {
+                    newTicketName += messageWithSplit[i] + "-";
                 }
-                newTicketName = newTicketName.substring(0,newTicketName.length()-1);
+                newTicketName = newTicketName.substring(0, newTicketName.length() - 1);
 
                 String oldChannelName = channel.getName();
+                String ticketID = oldChannelName;
+                String IDNUMBER = "";
+                String TicketNameNoNum = "";
+                for (int k = 0; k < oldChannelName.length(); k++) {
+                    char Char = oldChannelName.charAt(k);
+                    String SChar = Char + "";
+                    ArrayList myIntArray = new ArrayList();
+                    myIntArray.add("0");
+                    myIntArray.add("1");
+                    myIntArray.add("2");
+                    myIntArray.add("3");
+                    myIntArray.add("4");
+                    myIntArray.add("5");
+                    myIntArray.add("6");
+                    myIntArray.add("7");
+                    myIntArray.add("8");
+                    myIntArray.add("9");
 
-                String[] oldChannelNameNumber = oldChannelName.split("-");
-                String ticketID = oldChannelNameNumber[1];
+                    if (myIntArray.contains(SChar)) {
+                        IDNUMBER = IDNUMBER + SChar;
+                    } else {
+                        TicketNameNoNum = TicketNameNoNum + SChar;
+                    }
+                }
+
+                String FinalTicketOutPut = newTicketName + "-" + IDNUMBER;
+                FinalTicketOutPut = FinalTicketOutPut.toLowerCase();
 
                 EmbedBuilder EmbedRules = new EmbedBuilder();
                 EmbedRules.setTitle("Ticket Rename");
                 EmbedRules.setColor(Color);
                 EmbedRules.setThumbnail(UsersAvatarURL);
                 EmbedRules.addField("Ticket ID:",
-                        "**" + e.getChannel().getName() + " was changed to " + newTicketName + "-" + ticketID + "**",
+                        "**" + e.getChannel().getName() + " was changed to " + FinalTicketOutPut + "**",
                         false);
                 EmbedRules.setTimestamp(LocalTime);
                 EmbedRules.setFooter("Changed By " + e.getAuthor().getAsTag(), e.getMember().getUser().getAvatarUrl());
@@ -147,18 +173,11 @@ public class Ticket_Rename extends ListenerAdapter {
                     e.getMessage().delete().queue();
                 });
                 System.out.println(newTicketName + "-" + ticketID);
-                if (e.getChannel().getName().contains("admin")) {
-                    e.getChannel().getManager().setName("admin-" + newTicketName + "-" + ticketID).queue();
-                } else if (e.getChannel().getName().contains("application")) {
-                    e.getChannel().getManager().setName("application-" + newTicketName + "-" + ticketID).queue();
-                } else {
-                    e.getChannel().getManager().setName(newTicketName + "-" + ticketID).queue();
-                }
-
+                e.getChannel().getManager().setName(FinalTicketOutPut).queue();
 
                 JSONObject all = new JSONObject();
                 all.put("ChannelID", ChannelID);
-                all.put("ChannelName", newTicketName + "-" + ticketID);
+                all.put("ChannelName", FinalTicketOutPut);
                 all.put("CategoryID", CategoryID);
                 all.put("UsersID", UsersID);
                 all.put("UsersTag", UsersTag);

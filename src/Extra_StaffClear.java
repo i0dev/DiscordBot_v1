@@ -105,6 +105,7 @@ public class Extra_StaffClear extends ListenerAdapter {
                             e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i))).queue();
                         }
                     }
+                    e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
 
 
                     EmbedBuilder EmbedFirst = new EmbedBuilder()
@@ -129,6 +130,7 @@ public class Extra_StaffClear extends ListenerAdapter {
                             e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i))).queue();
                         }
                     }
+                    e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
 
 
                     EmbedBuilder EmbedFirst = new EmbedBuilder()

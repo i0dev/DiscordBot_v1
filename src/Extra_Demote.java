@@ -123,7 +123,7 @@ public class Extra_Demote extends ListenerAdapter {
                                 .setTimestamp(now)
                                 .setFooter(Bot.WaterMark, BotLogo);
                         channel.sendMessage(EmbedFirst.build()).queue();
-
+                        e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
                     } else {
 
                         EmbedBuilder EmbedFirst = new EmbedBuilder()
@@ -137,7 +137,6 @@ public class Extra_Demote extends ListenerAdapter {
 
                     }
                 } else {
-
 
                     User MentionedUser = e.getMessage().getMentionedUsers().get(0);
                     Member MentionedMember = e.getMessage().getMentionedMembers().get(0);
@@ -166,6 +165,7 @@ public class Extra_Demote extends ListenerAdapter {
                                 .setTimestamp(now)
                                 .setFooter(Bot.WaterMark, BotLogo);
                         channel.sendMessage(EmbedFirst.build()).queue();
+                        e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
 
                         EmbedBuilder Embed = new EmbedBuilder()
                                 .setTitle("Incoming Staff Movement!")
