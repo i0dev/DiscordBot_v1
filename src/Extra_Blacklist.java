@@ -9,11 +9,13 @@ import org.json.simple.parser.JSONParser;
 import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
-public class Command_Ban extends ListenerAdapter {
+public class Extra_Blacklist extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
@@ -21,7 +23,7 @@ public class Command_Ban extends ListenerAdapter {
         Color Color = java.awt.Color.decode(Bot.ColorHexCode);
         MessageChannel channel = e.getChannel();
         String[] message = e.getMessage().getContentRaw().split(" ");
-        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "ban")) {
+        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "blacklist")) {
             ArrayList<String> BlacklistedGet = new ArrayList<>(); if (new File("BlacklistedUsers.json").exists()) { try { JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json"))); BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers"); } catch (Exception ee) { ee.printStackTrace(); } } boolean isBlacklisted = false; for (String s : BlacklistedGet) { if (e.getAuthor().getId().equals(s)) { isBlacklisted = true; } } if (isBlacklisted) { EmbedBuilder UserBlacklisted = new EmbedBuilder() .setTitle("Error") .setThumbnail(Bot.BotLogo) .setFooter(Bot.WaterMark, Bot.BotLogo) .setTimestamp(Bot.now) .setColor(Color.RED) .setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*"); e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> { e.getMessage().delete().queue(); message3.addReaction("❌").queue(); message3.delete().queueAfter(10, TimeUnit.SECONDS); }); return; }
         }
         boolean isAllowed = false;
@@ -31,12 +33,12 @@ public class Command_Ban extends ListenerAdapter {
             }
         }
 
-        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "ban")) {
+        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "blacklist")) {
             if (isAllowed) {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
                 EmbedRules.setTitle("Incorrect Format");
                 EmbedRules.setColor(Color);
-                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "ban [@user] [reason]", false);
+                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "blacklist [@user]", false);
                 EmbedRules.setTimestamp(Bot.now);
                 EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
                 channel.sendMessage(EmbedRules.build()).queue(message1 -> {
@@ -54,64 +56,79 @@ public class Command_Ban extends ListenerAdapter {
                 });
             }
         }
-        if (message.length == 2 && message[0].equalsIgnoreCase(Bot.BotPrefix + "ban")) {
+
+        if (message.length == 2 && message[0].equalsIgnoreCase(Bot.BotPrefix + "blacklist")) {
             if (isAllowed) {
-                EmbedBuilder EmbedRules = new EmbedBuilder();
-                EmbedRules.setTitle("Incorrect Format");
-                EmbedRules.setColor(Color);
-                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "ban [@user] [reason]", false);
-                EmbedRules.setTimestamp(Bot.now);
-                EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
-                channel.sendMessage(EmbedRules.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
-                });
-            } else {
-                EmbedBuilder EmbedRules = new EmbedBuilder();
-                EmbedRules.setTitle("Insufficient Permissions");
-                EmbedRules.setColor(Color);
-                EmbedRules.addField("Error:", "You do not have permission to run this command!", false);
-                EmbedRules.setTimestamp(Bot.now);
-                EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
-                channel.sendMessage(EmbedRules.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
-                });
-            }
-        }
-        if (message.length > 2 && message[0].equalsIgnoreCase(Bot.BotPrefix + "ban")) {
-            if (isAllowed) {
+
                 User MentionedUser = e.getMessage().getMentionedUsers().get(0);
                 Member MentionedMember = e.getMessage().getMentionedMembers().get(0);
-
-                e.getGuild().ban(MentionedMember, 0).queue();
-
-                String reason = "";
-                for (int k = 2; k < message.length; k++) {
-                    reason = reason + " " + message[k] + " ";
+                ArrayList<String> BlacklistedGet = new ArrayList<>();
+                if (new File("BlacklistedUsers.json").exists()) {
+                    try {
+                        JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                        BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
                 }
 
+
+                boolean isBlacklisted = false;
+                for (String s : BlacklistedGet) {
+                    if (MentionedUser.getId().equals(s)) {
+                        isBlacklisted = true;
+                    }
+                }
+                BlacklistedGet.clear();
                 EmbedBuilder EmbedRules = new EmbedBuilder();
-                EmbedRules.setTitle("Successfully Banned");
-                EmbedRules.setColor(Color);
-                EmbedRules.addField("Success", e.getMember().getUser().getAsTag() + ", you have banned " + MentionedUser.getAsTag(), false);
-                EmbedRules.addField("Reason", reason, false);
-                EmbedRules.setTimestamp(Bot.now);
-                EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
-                e.getChannel().sendMessage(EmbedRules.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
-                });
+                if (isBlacklisted) {
+                    EmbedRules.setTitle("Error while Blacklisting");
+                    EmbedRules.setColor(Color);
+                    EmbedRules.addField("Error", e.getMember().getUser().getAsTag() + ", " + MentionedUser.getAsTag() + " is **Already** blacklisted!", false);
+                    EmbedRules.setTimestamp(Bot.now);
+                    EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
+                    channel.sendMessage(EmbedRules.build()).queue(message1 -> {
+                        e.getMessage().delete().queue();
+                    });
 
-                EmbedBuilder logs = new EmbedBuilder()
-                        .setTitle("Ban Logs")
-                        .setColor(Color)
-                        .addField("User", e.getMember().getUser().getAsTag() + ", has banned " + MentionedUser.getAsTag(), false)
-                        .addField("Reason", reason, false)
-                        .setTimestamp(Bot.now)
-                        .setFooter(Bot.WaterMark, Bot.Logo);
-                e.getGuild().getTextChannelById(Bot.LogsChannelID).sendMessage(logs.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
-                });
+                } else {
 
 
+                    BlacklistedGet.add(MentionedMember.getId());
+
+                    if (new File("BlacklistedUsers.json").exists()) {
+                        try {
+
+                            JSONObject all = new JSONObject();
+                            all.put("BlacklistedUsers", BlacklistedGet);
+
+                            try {
+                                Files.write(Paths.get("BlacklistedUsers.json"), all.toJSONString().getBytes());
+                            } catch (Exception ef) {
+                                ef.printStackTrace();
+                            }
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+
+                    EmbedRules.setTitle("Successfully Blacklisted");
+                    EmbedRules.setColor(Color);
+                    EmbedRules.addField("Success", e.getMember().getUser().getAsTag() + ", you have Blacklisted " + MentionedUser.getAsTag() + " From using all bot commands", false);
+                    EmbedRules.setTimestamp(Bot.now);
+                    EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
+                    channel.sendMessage(EmbedRules.build()).queue(message1 -> {
+                        e.getMessage().delete().queue();
+                    });
+
+                    EmbedBuilder logs = new EmbedBuilder()
+                            .setTitle("Blacklist Logs")
+                            .setColor(Color)
+                            .addField("User", e.getMember().getUser().getAsTag() + ", has blacklisted " + MentionedUser.getAsTag() + " From using all bot commands", false)
+                            .setTimestamp(Bot.now)
+                            .setFooter(Bot.WaterMark, Bot.Logo);
+                    e.getGuild().getTextChannelById(Bot.LogsChannelID).sendMessage(logs.build()).queue();
+                }
             } else {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
                 EmbedRules.setTitle("Insufficient Permissions");

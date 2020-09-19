@@ -82,6 +82,9 @@ public class Bot {
         if (!new File("Applications.json").exists()) {
             new File("Applications.json").createNewFile();
         }
+        if (!new File("BlacklistedUsers.json").exists()) {
+            new File("BlacklistedUsers.json").createNewFile();
+        }
         if (!new File("config.json").exists()) {
             new File("config.json").createNewFile();
             loadDefaults();
@@ -123,23 +126,33 @@ public class Bot {
                 e.printStackTrace();
             }
         }
-
-        JFrame frame = new JFrame(BotName);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-        frame.setBounds(500, 200, 500, 500);
-        frame.setBackground(Color.BLUE);
-        frame.setTitle(BotName + " Bot");
-        frame.add(new JLabel(BotName + " Bot"), JLabel.CENTER);
-
+        try {
+            JFrame frame = new JFrame(BotName);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.pack();
+            frame.setVisible(true);
+            frame.setBounds(500, 200, 500, 500);
+            frame.setBackground(Color.BLUE);
+            frame.setTitle(BotName + " Bot");
+            frame.add(new JLabel(BotName + " Bot"), JLabel.CENTER);
+        } catch (Exception e) {
+            System.out.println("");
+            System.out.println("");
+            System.out.println("-------------------------------");
+            System.out.println("|      J-Frame disabling!     |");
+            System.out.println("|  This version of OS doesn't |");
+            System.out.println("|   support a java j-frame!   |");
+            System.out.println("-------------------------------");
+            System.out.println("");
+            System.out.println("");
+        }
         try {
             jda = new JDABuilder(BotToken).setActivity(Activity.playing(BotActivity)).setStatus(BotStatus).build();
         } catch (LoginException e) {
             e.printStackTrace();
         }
 
-      //  jda.addEventListener(new Applications_New());
+        //  jda.addEventListener(new Applications_New());
         jda.addEventListener(new Application_Accept());
         jda.addEventListener(new Application_Deny());
         jda.addEventListener(new Application_Review());
@@ -212,6 +225,11 @@ public class Bot {
         jda.addEventListener(new Fun_Hi());
         jda.addEventListener(new Fun_Pat());
         jda.addEventListener(new TEST_Polls());
+
+        jda.addEventListener(new Extra_UnBlacklist());
+        jda.addEventListener(new Extra_GetBlacklisted());
+        jda.addEventListener(new Extra_Blacklist());
+        jda.addEventListener(new Command_Clear());
 
     }
 

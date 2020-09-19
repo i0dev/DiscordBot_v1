@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 
@@ -45,6 +46,7 @@ public class Ticket_New extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {
+
         try {
             JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/config.json")));
             BotPrefix = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotPrefix");
@@ -120,6 +122,27 @@ public class Ticket_New extends ListenerAdapter {
                 EmojiSimple = Emoji.substring(2, Emoji.length() - 20);
             }
 
+            if (!e.getMember().getUser().isBot() && e.getReactionEmote().getName().equals(EmojiSimple) && e.getChannel().getId().equals(TicketCreateChannelID)) {
+                ArrayList<String> BlacklistedGet = new ArrayList<>();
+                if (new File("BlacklistedUsers.json").exists()) {
+                    try {
+                        JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                        BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+                boolean isBlacklisted = false;
+                for (String s : BlacklistedGet) {
+                    if (e.getUser().getId().equals(s)) {
+                        isBlacklisted = true;
+                    }
+                }
+                if (isBlacklisted) {
+
+                    return;
+                }
+            }
             if (!e.getMember().getUser().isBot() && e.getReactionEmote().getName().equals(EmojiSimple) && e.getChannel().getId().equals(TicketCreateChannelID)) {
                 e.getChannel().getHistoryFromBeginning(100).complete().getMessageById(e.getMessageId())
                         .removeReaction(EmojiWithoutArrow, e.getUser()).complete();

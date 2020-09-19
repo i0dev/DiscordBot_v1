@@ -14,10 +14,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
@@ -40,6 +37,33 @@ public class TEST_Help extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
+        String[] message = e.getMessage().getContentRaw().split(" ");
+        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "help")) {
+            ArrayList<String> BlacklistedGet = new ArrayList<>();
+            if (new File("BlacklistedUsers.json").exists()) {
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                    BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+            }
+            boolean isBlacklisted = false;
+            for (String s : BlacklistedGet) {
+                if (e.getAuthor().getId().equals(s)) {
+                    isBlacklisted = true;
+                }
+            }
+            if (isBlacklisted) {
+                EmbedBuilder UserBlacklisted = new EmbedBuilder().setTitle("Error").setThumbnail(Bot.BotLogo).setFooter(Bot.WaterMark, Bot.BotLogo).setTimestamp(Bot.now).setColor(Color.RED).setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*");
+                e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> {
+                    e.getMessage().delete().queue();
+                    message3.addReaction("❌").queue();
+                    message3.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
+        }
         try {
             JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/config.json")));
             BotPrefix = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotPrefix");
@@ -83,7 +107,7 @@ public class TEST_Help extends ListenerAdapter {
 
             EmbedRules.setColor(Color);
             EmbedRules.setTimestamp(LocalTime);
-            EmbedRules.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
+            EmbedRules.setFooter(BotName, BotLogo);
             e.getChannel().sendMessage(EmbedRules.build()).queue(message1 -> {
                 e.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
                 message1.addReaction("1️⃣").queue();
@@ -102,6 +126,7 @@ public class TEST_Help extends ListenerAdapter {
                         e.getChannel().clearReactionsById(HelpMessageID).queue();
                         myTimer.cancel();
                         HelpMessageID = "";
+                        e.getChannel().deleteMessageById(HelpMessageID);
 
                     }
                     while (SecondsPassed >= 900000000) {
@@ -109,6 +134,7 @@ public class TEST_Help extends ListenerAdapter {
                         myTimer.cancel();
                         e.getChannel().clearReactionsById(HelpMessageID).queue();
                         HelpMessageID = "";
+                        e.getChannel().deleteMessageById(HelpMessageID);
 
                     }
                 }
@@ -169,7 +195,10 @@ public class TEST_Help extends ListenerAdapter {
                                     "**" + Bot.BotPrefix + "unmute** [user] [reason] > unmutes the user.\n" +
                                     "**" + Bot.BotPrefix + "announce** [#channel] [announcement] > sends an announcement to that channel\n" +
                                     "**" + Bot.BotPrefix + "say** [#channel] [announcement] > sends a silent-announcement to that channel\n" +
-                                    "**" + Bot.BotPrefix + "getMuted** > Gets all muted users\n"
+                                    "**" + Bot.BotPrefix + "getMuted** > Gets all muted users\n" +
+                                    "**" + Bot.BotPrefix + "Blacklist [@User]** > Blacklists that user from using ALL commands\n" +
+                                    "**" + Bot.BotPrefix + "UnBlacklist [@User]** > UnBlacklists that user from using ALL commands\n" +
+                                    "**" + Bot.BotPrefix + "GetBlacklisted [@User]** > Lists all the currently blacklisted users\n"
 
 
                             , false)
@@ -201,7 +230,8 @@ public class TEST_Help extends ListenerAdapter {
                                     "**" + BotPrefix + "Resign [@User] <-s>** **→** Resigns that user and clears their staff roles\n" +
                                     "**" + BotPrefix + "FacLeader [@User]** **→** Gives that user Faction Leader Role\n" +
                                     "**" + BotPrefix + "Confirm [@Leader] [Faction Name] [Roster Size]** **→** Confirms that faction as playing\n" +
-                                    "**" + BotPrefix + "Poll [Number Of Options]** **→** Starts the Poll-Creator in DMS\n"
+                                    "**" + BotPrefix + "Poll [Number Of Options]** **→** Starts the Poll-Creator in DMS\n" +
+                                    "**" + BotPrefix + "Clear** **→** Clears nearly all messages in a channel\n"
 
 
                             , false)
@@ -295,7 +325,7 @@ public class TEST_Help extends ListenerAdapter {
                             ":five: » **Fun Commands**\n");
 
             EmbedRules.setTimestamp(LocalTime);
-            EmbedRules.setFooter("", BotLogo);
+            EmbedRules.setFooter(BotName, BotLogo);
             e.getChannel().clearReactionsById(HelpMessageID).queue();
             SecondsPassed = 0;
             e.getChannel().editMessageById(HelpMessageID, EmbedRules.build()).queue(message1 -> {

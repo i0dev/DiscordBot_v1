@@ -33,12 +33,12 @@ public class Auto_Mod extends ListenerAdapter {
         if (e.getMessage().getMentionedUsers().size() > 0) {
             if (e.getMessage().getMentionedUsers().get(0).getId().equals(e.getGuild().getSelfMember().getId())) {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
-                EmbedRules.setTitle("Bot Prefix");
+                EmbedRules.setTitle(e.getJDA().getSelfUser().getName());
                 EmbedRules.setColor(Color);
-                EmbedRules.addField("My prefix is:", "``" + Bot.BotPrefix + "``", false);
-
+                EmbedRules.setDescription(">>> My prefix is: " + "``" + Bot.BotPrefix + "``\nType `" + Bot.BotPrefix + "help` to see all commands\n");
+                EmbedRules.setThumbnail(Bot.BotLogo);
                 EmbedRules.setTimestamp(Bot.now);
-                EmbedRules.setFooter("Requested By: " + e.getAuthor().getAsTag(), Bot.Logo);
+                EmbedRules.setFooter("Bot created by i0dev.com", "https://cdn.discordapp.com/attachments/667207717882036234/746181096995291156/i01.png");
                 e.getChannel().sendMessage(EmbedRules.build()).queue();
             }
         }
