@@ -68,7 +68,30 @@ public class Extra_Suggest extends ListenerAdapter {
         MessageChannel channel = e.getChannel();
         String[] message = e.getMessage().getContentRaw().split(" ");
         if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "suggest")) {
-            ArrayList<String> BlacklistedGet = new ArrayList<>(); if (new File("BlacklistedUsers.json").exists()) { try { JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json"))); BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers"); } catch (Exception ee) { ee.printStackTrace(); } } boolean isBlacklisted = false; for (String s : BlacklistedGet) { if (e.getAuthor().getId().equals(s)) { isBlacklisted = true; } } if (isBlacklisted) { EmbedBuilder UserBlacklisted = new EmbedBuilder() .setTitle("Error") .setThumbnail(Bot.BotLogo) .setFooter(Bot.WaterMark, Bot.BotLogo) .setTimestamp(Bot.now) .setColor(Color.RED) .setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*"); e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> { e.getMessage().delete().queue(); message3.addReaction("❌").queue(); message3.delete().queueAfter(10, TimeUnit.SECONDS); }); return; }
+            ArrayList<String> BlacklistedGet = new ArrayList<>();
+            if (new File("BlacklistedUsers.json").exists()) {
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                    BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+            }
+            boolean isBlacklisted = false;
+            for (String s : BlacklistedGet) {
+                if (e.getAuthor().getId().equals(s)) {
+                    isBlacklisted = true;
+                }
+            }
+            if (isBlacklisted) {
+                EmbedBuilder UserBlacklisted = new EmbedBuilder().setTitle("Error").setThumbnail(Bot.BotLogo).setFooter(Bot.WaterMark, Bot.BotLogo).setTimestamp(Bot.now).setColor(Color.RED).setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*");
+                e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> {
+                    e.getMessage().delete().queue();
+                    message3.addReaction("❌").queue();
+                    message3.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
         }
         boolean isAllowed = true;
 
@@ -83,9 +106,9 @@ public class Extra_Suggest extends ListenerAdapter {
                     Gamemodes = "No gamemodes to display!";
                 } else {
                     for (int i = 0; i < SuggestionGameModes.size(); i++) {
-                        Gamemodes = Gamemodes +  SuggestionGameModes.get(i)+", ";
+                        Gamemodes = Gamemodes + SuggestionGameModes.get(i) + ", ";
                     }
-                    Gamemodes = Gamemodes.substring(0,Gamemodes.length()-2);
+                    Gamemodes = Gamemodes.substring(0, Gamemodes.length() - 2);
                 }
                 EmbedRules.addField("Gamemodes:", "`" + Gamemodes + "`", false);
                 EmbedRules.setTimestamp(now);
@@ -116,9 +139,9 @@ public class Extra_Suggest extends ListenerAdapter {
                     Gamemodes = "No gamemodes to display!";
                 } else {
                     for (int i = 0; i < SuggestionGameModes.size(); i++) {
-                        Gamemodes = Gamemodes +  SuggestionGameModes.get(i)+", ";
+                        Gamemodes = Gamemodes + SuggestionGameModes.get(i) + ", ";
                     }
-                    Gamemodes = Gamemodes.substring(0,Gamemodes.length()-2);
+                    Gamemodes = Gamemodes.substring(0, Gamemodes.length() - 2);
                 }
                 EmbedRules.addField("Gamemodes:", "`" + Gamemodes + "`", false);
                 EmbedRules.setTimestamp(now);
@@ -173,8 +196,8 @@ public class Extra_Suggest extends ListenerAdapter {
                             .setTitle("Incoming suggestion from " + e.getAuthor().getAsTag())
                             .setColor(Color)
                             .addField("Suggestion for " + Gamemode, suggestion, false)
-                            .addField("Do you agree?", "Show how you feel by reacting to this message!", false)
                             .setTimestamp(now)
+                            .setThumbnail(e.getAuthor().getAvatarUrl())
                             .setFooter(Bot.WaterMark, BotLogo);
                     e.getGuild().getTextChannelById(SuggestionChannelID).sendMessage(Embed.build()).queue(message1 -> {
                         e.getMessage().delete().queue();
@@ -192,9 +215,9 @@ public class Extra_Suggest extends ListenerAdapter {
                         Gamemodes = "No gamemodes to display!";
                     } else {
                         for (int i = 0; i < SuggestionGameModes.size(); i++) {
-                            Gamemodes = Gamemodes +  SuggestionGameModes.get(i)+", ";
+                            Gamemodes = Gamemodes + SuggestionGameModes.get(i) + ", ";
                         }
-                        Gamemodes = Gamemodes.substring(0,Gamemodes.length()-2);
+                        Gamemodes = Gamemodes.substring(0, Gamemodes.length() - 2);
                     }
                     EmbedRules.addField("Gamemodes:", "`" + Gamemodes + "`", false);
                     EmbedRules.setTimestamp(now);

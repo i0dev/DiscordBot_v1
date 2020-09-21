@@ -46,7 +46,6 @@ public class Ticket_New extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent e) {
-
         try {
             JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/config.json")));
             BotPrefix = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotPrefix");

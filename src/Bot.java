@@ -64,9 +64,11 @@ public class Bot {
     public static String SupportTeamRoleID = "";
     public static String AdminRoleID = "";
     public static ArrayList<String> ApplicationQuestions = new ArrayList<>();
+    public static ArrayList<String> AutoModChannelIDS = new ArrayList<>();
+    public static ArrayList<String> LightAllowedRoleIDS = new ArrayList<>();
     public static String MemberRoleID = "";
 
-    public static String[] BlockedWordsList = {"nigger", "Faggot", "n1gger", "n1g3r", "nigga", "n1gga", "niga"};
+    public static String[] BlockedWordsList = {"nigger", "faggot", "n1gger", "n1g3r", "nigga", "n1gga", "niga"};
 
     public static void main(String args[]) throws Exception {
 
@@ -151,6 +153,7 @@ public class Bot {
         } catch (LoginException e) {
             e.printStackTrace();
         }
+
 
         //  jda.addEventListener(new Applications_New());
         jda.addEventListener(new Application_Accept());
@@ -242,7 +245,6 @@ public class Bot {
         JSONObject InsideStringTicketObject = new JSONObject();
         InsideStringTicketObject.put("Emoji", "<:ffff:747892948187873431>");
         InsideStringTicketObject.put("TicketPrefix", "general-");
-        InsideStringTicketObject.put("CloseTicketTrashEmoji", "\uD83D\uDDD1"); //🗑
         QuestionFormat.add("What is your question?");
         QuestionFormat.add("What is your IGN");
         InsideStringTicketObject.put("QuestionFormat", QuestionFormat);
@@ -253,7 +255,6 @@ public class Bot {
         JSONObject InsideStringTicketObject2 = new JSONObject();
         InsideStringTicketObject2.put("Emoji", "<:i01:750090634278338610>");
         InsideStringTicketObject2.put("TicketPrefix", "admin-");
-        InsideStringTicketObject2.put("CloseTicketTrashEmoji", "\uD83D\uDDD1"); //🗑
         QuestionFormat2.add("What is your question?");
         QuestionFormat2.add("What is your IGN");
         InsideStringTicketObject2.put("QuestionFormat", QuestionFormat2);
@@ -319,11 +320,19 @@ public class Bot {
         JSONObject RoleIDS = new JSONObject();
         RoleIDS.put("SupportTeamRoleID", "744039663995584562");
         RoleIDS.put("AdminRoleID", "747864895483019324");
+        ArrayList<String> LightRolesDefault = new ArrayList<String>();
+        LightRolesDefault.add("748918917854134404");
+        LightRolesDefault.add("748918918889865267");
+        RoleIDS.put("LightAllowedRolesList", LightRolesDefault);
         RoleIDS.put("MemberRoleID", "744039668546535544");
         RoleIDS.put("FacLeaderRoleID", "755805707881938965");
         JSONObject ChannelIDS = new JSONObject();
         ChannelIDS.put("TicketLogsChannelID", "744580370044813362");
         ChannelIDS.put("SuggestionChannelID", "751860128055165008");
+         ArrayList<String> AutoModChannelIDSD = new ArrayList<>();
+        AutoModChannelIDSD.add("748918917854134404");
+        AutoModChannelIDSD.add("748918918889865267");
+        ChannelIDS.put("AutoModChannelIDS", AutoModChannelIDSD);
         ChannelIDS.put("StaffMovementsChannelID", "751873062026346506");
         ChannelIDS.put("AdminLogsChannelID", "744580384423149734");
         ChannelIDS.put("ConfirmedFactionChannelID", "756166636402245763");
@@ -414,8 +423,13 @@ public class Bot {
             SupportTeamRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("SupportTeamRoleID");
             ConfirmedFactionChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("ConfirmedFactionChannelID");
             ApplicationQuestions = ((HashMap<String, ArrayList>) json.get("GeneralConfig")).get("ApplicationQuestions");
+            LightAllowedRoleIDS = ((HashMap<String, ArrayList<String>>) json.get("RoleIDS")).get("LightAllowedRolesList");
+            AutoModChannelIDS = ((HashMap<String, ArrayList<String>>) json.get("ChannelIDS")).get("AutoModChannelIDS");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 }

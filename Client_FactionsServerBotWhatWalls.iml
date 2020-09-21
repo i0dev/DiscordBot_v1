@@ -10,15 +10,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../Dependencies and Resources/JDA-4.1.1_149-withDependencies.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/../../Dependencies and Resources/java-json.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -31,6 +22,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../../Dependencies and Resources/json-simple-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../Dependencies and Resources/JDA-4.2.0_204-withDependencies.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

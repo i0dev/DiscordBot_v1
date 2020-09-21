@@ -66,9 +66,10 @@ public class Extra_Resign extends ListenerAdapter {
         }
 
         boolean isAllowed = false;
-        if (e.getMember().getRoles().contains(e.getGuild().getRoleById(AdminRoleID)) ||
-                e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
-            isAllowed = true;
+        for (int i = 0; i < Bot.AllowedRoles.size(); i++) {
+            if (e.getMember().getRoles().contains(e.getGuild().getRoleById(Bot.AllowedRoles.get(i))) || e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
+                isAllowed = true;
+            }
         }
         if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "resign")) {
             if (isAllowed) {

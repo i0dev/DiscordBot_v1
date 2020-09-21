@@ -30,7 +30,11 @@ public class Command_UnMute extends ListenerAdapter {
                 isAllowed = true;
             }
         }
-
+        for (int i = 0; i < Bot.LightAllowedRoleIDS.size(); i++) {
+            if (e.getMember().getRoles().contains(e.getGuild().getRoleById(Bot.LightAllowedRoleIDS.get(i))) || e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
+                isAllowed = true;
+            }
+        }
         if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "unmute")) {
             if (isAllowed) {
                 EmbedBuilder EmbedRules = new EmbedBuilder();

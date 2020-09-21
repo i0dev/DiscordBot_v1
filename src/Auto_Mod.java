@@ -6,6 +6,10 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 
 @SuppressWarnings("unused")
 
@@ -19,10 +23,19 @@ public class Auto_Mod extends ListenerAdapter {
         String channel = e.getChannel().getId();
         String message = e.getMessage().getContentRaw();
 
-        if (message.contains("discord.gg") && !e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
+        boolean isAutoModChannel = false;
+        for (int i = 0; i < Bot.AutoModChannelIDS.size(); i++) {
+            if (e.getChannel().getId().equals(Bot.AutoModChannelIDS.get(i))) {
+
+                isAutoModChannel = true;
+            }
+        }
+        if (message.contains("discord.gg") && isAutoModChannel && !e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
 
             e.getMessage().delete().queue();
         }
+
+
         String[] messageArr = e.getMessage().getContentRaw().split(" ");
         if (e.getMessage().getMentionedUsers().size() > 5) {
             e.getMessage().delete().queue();
@@ -68,5 +81,6 @@ public class Auto_Mod extends ListenerAdapter {
         }
         TemporaryBlockedCount = 0;
     }
+
 
 }
