@@ -57,6 +57,7 @@ public class Bot {
     public static String Verify_RoleToGiveID = "";
 
     public static boolean StaffPingEnabled;
+    public static boolean AppsEnabled;
     public static String TicketCreateChannelID = "";
     public static String TicketCreateCategoryChannelID = "";
     public static String SuggestionChannelID = "";
@@ -329,7 +330,7 @@ public class Bot {
         JSONObject ChannelIDS = new JSONObject();
         ChannelIDS.put("TicketLogsChannelID", "744580370044813362");
         ChannelIDS.put("SuggestionChannelID", "751860128055165008");
-         ArrayList<String> AutoModChannelIDSD = new ArrayList<>();
+        ArrayList<String> AutoModChannelIDSD = new ArrayList<>();
         AutoModChannelIDSD.add("748918917854134404");
         AutoModChannelIDSD.add("748918918889865267");
         ChannelIDS.put("AutoModChannelIDS", AutoModChannelIDSD);
@@ -348,7 +349,7 @@ public class Bot {
         SuggestionGameModesDEFAULT.add("Factions");
         SuggestionGameModesDEFAULT.add("SkyBlock");
         GeneralConfig.put("SuggestionGameModes", SuggestionGameModesDEFAULT);
-        GeneralConfig.put("StaffPingEnabled", true);
+        GeneralConfig.put("AppsEnabled", true);
         GeneralConfig.put("BotPrefix", ".");
         GeneralConfig.put("TicketPanelOverAllDescription", "Click to one of the emojis to create a corresponding ticket!");
         GeneralConfig.put("BotToken", "");
@@ -364,13 +365,11 @@ public class Bot {
         AppQuestionsDefault.add("What is your Favorite Candy");
         GeneralConfig.put("StaffRoleIDS", AppQuestionsDefault);
         ArrayList<String> AllowedRolesDEFAULT = new ArrayList<String>();
-
         JSONObject Extras = new JSONObject();
         AllowedRolesDEFAULT.add("748918917854134404");
         AllowedRolesDEFAULT.add("748918918889865267");
         Extras.put("AllowedRoles", AllowedRolesDEFAULT);
         Extras.put("LogsChannelID", "748915292767518830");
-
         JSONObject all = new JSONObject();
         all.put("Extras", Extras);
         all.put("GeneralConfig", GeneralConfig);

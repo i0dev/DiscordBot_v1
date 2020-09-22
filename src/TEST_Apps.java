@@ -35,7 +35,7 @@ public class TEST_Apps extends ListenerAdapter {
     public String userID;
     public ArrayList<String> responses = new ArrayList<>();
     public ArrayList<String> Questions = new ArrayList<>();
-
+    public boolean AppsEnabled = true;
     public int SecondsPassed = 0;
     int identifier = 0;
     int CurrentQuestion = 0;
@@ -52,6 +52,7 @@ public class TEST_Apps extends ListenerAdapter {
             AllowedRoles = ((HashMap<String, ArrayList>) json.get("Extras")).get("AllowedRoles");
             LogsChannelID = ((HashMap<String, String>) json.get("Extras")).get("LogsChannelID");
             AdminRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("AdminRoleID");
+            AppsEnabled = ((HashMap<String, Boolean>) json.get("GeneralConfig")).get("AppsEnabled");
 
         } catch (Exception ee) {
             ee.printStackTrace();
@@ -60,10 +61,56 @@ public class TEST_Apps extends ListenerAdapter {
         MessageChannel channel = e.getChannel();
         String[] message = e.getMessage().getContentRaw().split(" ");
         if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "Apply")) {
-            ArrayList<String> BlacklistedGet = new ArrayList<>(); if (new File("BlacklistedUsers.json").exists()) { try { JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json"))); BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers"); } catch (Exception ee) { ee.printStackTrace(); } } boolean isBlacklisted = false; for (String s : BlacklistedGet) { if (e.getAuthor().getId().equals(s)) { isBlacklisted = true; } } if (isBlacklisted) { EmbedBuilder UserBlacklisted = new EmbedBuilder() .setTitle("Error") .setThumbnail(Bot.BotLogo) .setFooter(Bot.WaterMark, Bot.BotLogo) .setTimestamp(Bot.now) .setColor(Color.RED) .setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*"); e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> { e.getMessage().delete().queue(); message3.addReaction("❌").queue(); message3.delete().queueAfter(10, TimeUnit.SECONDS); }); return; }
+            ArrayList<String> BlacklistedGet = new ArrayList<>();
+            if (new File("BlacklistedUsers.json").exists()) {
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                    BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+            }
+            boolean isBlacklisted = false;
+            for (String s : BlacklistedGet) {
+                if (e.getAuthor().getId().equals(s)) {
+                    isBlacklisted = true;
+                }
+            }
+            if (isBlacklisted) {
+                EmbedBuilder UserBlacklisted = new EmbedBuilder().setTitle("Error").setThumbnail(Bot.BotLogo).setFooter(Bot.WaterMark, Bot.BotLogo).setTimestamp(Bot.now).setColor(Color.RED).setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*");
+                e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> {
+                    e.getMessage().delete().queue();
+                    message3.addReaction("❌").queue();
+                    message3.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
         }
         if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "CancelApps")) {
-            ArrayList<String> BlacklistedGet = new ArrayList<>(); if (new File("BlacklistedUsers.json").exists()) { try { JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json"))); BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers"); } catch (Exception ee) { ee.printStackTrace(); } } boolean isBlacklisted = false; for (String s : BlacklistedGet) { if (e.getAuthor().getId().equals(s)) { isBlacklisted = true; } } if (isBlacklisted) { EmbedBuilder UserBlacklisted = new EmbedBuilder() .setTitle("Error") .setThumbnail(Bot.BotLogo) .setFooter(Bot.WaterMark, Bot.BotLogo) .setTimestamp(Bot.now) .setColor(Color.RED) .setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*"); e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> { e.getMessage().delete().queue(); message3.addReaction("❌").queue(); message3.delete().queueAfter(10, TimeUnit.SECONDS); }); return; }
+            ArrayList<String> BlacklistedGet = new ArrayList<>();
+            if (new File("BlacklistedUsers.json").exists()) {
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                    BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+            }
+            boolean isBlacklisted = false;
+            for (String s : BlacklistedGet) {
+                if (e.getAuthor().getId().equals(s)) {
+                    isBlacklisted = true;
+                }
+            }
+            if (isBlacklisted) {
+                EmbedBuilder UserBlacklisted = new EmbedBuilder().setTitle("Error").setThumbnail(Bot.BotLogo).setFooter(Bot.WaterMark, Bot.BotLogo).setTimestamp(Bot.now).setColor(Color.RED).setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*");
+                e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> {
+                    e.getMessage().delete().queue();
+                    message3.addReaction("❌").queue();
+                    message3.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
         }
         boolean isAllowed = false;
         for (int i = 0; i < Bot.AllowedRoles.size(); i++) {
@@ -71,6 +118,7 @@ public class TEST_Apps extends ListenerAdapter {
                 isAllowed = true;
             }
         }
+
         if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "CancelApps") && !e.getAuthor().isBot()) {
             if (isAllowed) {
                 if (CurrentQuestion == -1) {
@@ -110,67 +158,180 @@ public class TEST_Apps extends ListenerAdapter {
         }
         if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "apply") && !e.getAuthor().isBot()) {
             if (CurrentQuestion == -1 || CurrentQuestion == 0) {
-                this.applicant = e.getMember().getUser();
-                this.applicantMember = e.getMember();
-                final EmbedBuilder EmbedRules = new EmbedBuilder();
-                this.userID = e.getAuthor().getId();
-                EmbedRules.setTitle("Application");
-                EmbedRules.setDescription("Hey **" + e.getMember().getUser().getAsTag() + "**, Please look at your Direct messages");
-                EmbedRules.setColor(Color);
-                EmbedRules.setTimestamp(Bot.now);
-                EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
-                channel.sendMessage(EmbedRules.build()).queue(message1 -> e.getMessage().delete().queueAfter(3L, TimeUnit.SECONDS));
-                this.DMS = e.getMember().getUser().openPrivateChannel().complete();
-                final EmbedBuilder DMSHeader = new EmbedBuilder();
-                DMSHeader.setDescription("**Application Started!** \n\n Type **.cancel** at any time to stop the application");
-                DMSHeader.setColor(java.awt.Color.GREEN);
-                DMSHeader.setFooter(Bot.WaterMark, Bot.Logo);
-                this.DMS.sendMessage(DMSHeader.build()).queue();
-
-                userID = e.getAuthor().getId();
-
-
-                final EmbedBuilder Question1 = new EmbedBuilder();
-                Questions = Bot.ApplicationQuestions;
-                Questions.add("Type **Submit** to submit your application");
-                Question1.setTitle("Question " + 1 + "/" + (Questions.size() - 1));
-
-                Question1.setDescription(Questions.get(0));
-                Question1.setColor(Color);
-                Question1.setFooter(Bot.WaterMark, Bot.Logo);
-                applicant = e.getAuthor();
-                DMS.sendMessage(Question1.build()).queue();
-                CurrentQuestion = 1;
-                responses.clear();
-                SecondsPassed = 0;
-                Timer myTimer = new Timer();
-                TimerTask task = new TimerTask() {
-                    public void run() {
-                        SecondsPassed++;
-                        System.out.println(SecondsPassed);
-
-                        while (SecondsPassed > (int) (Bot.ApplicationTimeoutTimeSECONDS) && SecondsPassed < 900000000) {
-                            SecondsPassed = 0;
-                            CurrentQuestion = -1;
-                            EmbedBuilder ember = new EmbedBuilder()
-                                    .setTitle("Application")
-                                    .setDescription("Your current application has timed out!, after `" + Bot.ApplicationTimeoutTimeSECONDS + "` seconds of inactivity.")
-                                    .setFooter(Bot.WaterMark, Bot.Logo)
-                                    .setColor(Color.RED);
-                            Bot.jda.getUserById(applicant.getId()).openPrivateChannel().complete().sendMessage(ember.build()).queue();
-                            myTimer.cancel();
-                        }
-                        while (SecondsPassed >= 900000000) {
-                            SecondsPassed = 0;
-                            CurrentQuestion = -1;
-                            myTimer.cancel();
-                            responses.clear();
+                if (!AppsEnabled) {
+                    EmbedBuilder EmbedRules = new EmbedBuilder();
+                    EmbedRules.setTitle(BotName + " Applications");
+                    EmbedRules.setColor(Color);
+                    EmbedRules.addField("Error:", "Applications are currently disabled.", false);
+                    EmbedRules.setTimestamp(Bot.now);
+                    EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
+                    channel.sendMessage(EmbedRules.build()).queue(message1 -> {
+                        e.getMessage().delete().queue();
+                    });
+                } else {
+                    ArrayList<ArrayList<String>> ApplicationsList = new ArrayList<>();
+                    if (new File("Applications.json").exists()) {
+                        try {
+                            JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Applications.json")));
+                            ApplicationsList = (ArrayList<ArrayList<String>>) json.get("ApplicationsList");
+                        } catch (Exception ee) {
+                            ee.printStackTrace();
                         }
                     }
-                };
-                myTimer.scheduleAtFixedRate(task, 0, 1000);
+                    if (ApplicationsList.size() == 0) {
+                        this.applicant = e.getMember().getUser();
+                        this.applicantMember = e.getMember();
+                        final EmbedBuilder EmbedRules = new EmbedBuilder();
+                        this.userID = e.getAuthor().getId();
+                        EmbedRules.setTitle("Application");
+                        EmbedRules.setDescription("Hey **" + e.getMember().getUser().getAsTag() + "**, Please look at your Direct messages");
+                        EmbedRules.setColor(Color);
+                        EmbedRules.setTimestamp(Bot.now);
+                        EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
+                        channel.sendMessage(EmbedRules.build()).queue(message1 -> e.getMessage().delete().queueAfter(3, TimeUnit.SECONDS));
+                        this.DMS = e.getMember().getUser().openPrivateChannel().complete();
+                        final EmbedBuilder DMSHeader = new EmbedBuilder();
+                        DMSHeader.setDescription("**Application Started!** \n\n Type **.cancel** at any time to stop the application");
+                        DMSHeader.setColor(java.awt.Color.GREEN);
+                        DMSHeader.setFooter(Bot.WaterMark, Bot.Logo);
+                        this.DMS.sendMessage(DMSHeader.build()).queue();
+
+                        userID = e.getAuthor().getId();
 
 
+                        final EmbedBuilder Question1 = new EmbedBuilder();
+                        Questions = Bot.ApplicationQuestions;
+                        Questions.add("Type **Submit** to submit your application");
+                        Question1.setTitle("Question " + 1 + "/" + (Questions.size() - 1));
+
+                        Question1.setDescription(Questions.get(0));
+                        Question1.setColor(Color);
+                        Question1.setFooter(Bot.WaterMark, Bot.Logo);
+                        applicant = e.getAuthor();
+                        DMS.sendMessage(Question1.build()).queue();
+                        CurrentQuestion = 1;
+                        responses.clear();
+
+                        SecondsPassed = 0;
+                        Timer myTimer = new Timer();
+                        TimerTask task = new TimerTask() {
+                            public void run() {
+                                SecondsPassed++;
+
+                                while (SecondsPassed > (int) (Bot.ApplicationTimeoutTimeSECONDS) && SecondsPassed < 900000000) {
+                                    SecondsPassed = 0;
+                                    CurrentQuestion = -1;
+                                    EmbedBuilder ember = new EmbedBuilder()
+                                            .setTitle("Application")
+                                            .setDescription("Your current application has timed out!, after `" + Bot.ApplicationTimeoutTimeSECONDS + "` seconds of inactivity.")
+                                            .setFooter(Bot.WaterMark, Bot.Logo)
+                                            .setColor(Color.RED);
+                                    Bot.jda.getUserById(applicant.getId()).openPrivateChannel().complete().sendMessage(ember.build()).queue();
+                                    myTimer.cancel();
+                                }
+                                while (SecondsPassed >= 900000000) {
+                                    SecondsPassed = 0;
+                                    CurrentQuestion = -1;
+                                    myTimer.cancel();
+                                    responses.clear();
+                                    Questions.remove(Questions.size() - 1);
+
+                                }
+                            }
+                        };
+                        myTimer.scheduleAtFixedRate(task, 0, 1000);
+                    } else {
+
+                        boolean StopAllForLoops = false;
+                        for (int j = 0; j < ApplicationsList.size(); j++) {
+                            boolean isAlreadyApplied = false;
+                            for (int f = 0; f < ApplicationsList.size(); f++) {
+                                if (e.getMember().getId().equals(ApplicationsList.get(f).get(0))) {
+                                    isAlreadyApplied = true;
+                                }
+                            }
+                            if (isAlreadyApplied == false && StopAllForLoops == false) {
+                                this.applicant = e.getMember().getUser();
+                                this.applicantMember = e.getMember();
+                                final EmbedBuilder EmbedRules = new EmbedBuilder();
+                                this.userID = e.getAuthor().getId();
+                                EmbedRules.setTitle("Application");
+                                EmbedRules.setDescription("Hey **" + e.getMember().getUser().getAsTag() + "**, Please look at your Direct messages");
+                                EmbedRules.setColor(Color);
+                                EmbedRules.setTimestamp(Bot.now);
+                                EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
+                                channel.sendMessage(EmbedRules.build()).queue(message1 -> e.getMessage().delete().queueAfter(3, TimeUnit.SECONDS));
+                                this.DMS = e.getMember().getUser().openPrivateChannel().complete();
+                                final EmbedBuilder DMSHeader = new EmbedBuilder();
+                                DMSHeader.setDescription("**Application Started!** \n\n Type **.cancel** at any time to stop the application");
+                                DMSHeader.setColor(java.awt.Color.GREEN);
+                                DMSHeader.setFooter(Bot.WaterMark, Bot.Logo);
+                                this.DMS.sendMessage(DMSHeader.build()).queue();
+
+                                userID = e.getAuthor().getId();
+
+
+                                final EmbedBuilder Question1 = new EmbedBuilder();
+                                Questions = Bot.ApplicationQuestions;
+                                Questions.add("Type **Submit** to submit your application");
+                                Question1.setTitle("Question " + 1 + "/" + (Questions.size() - 1));
+
+                                Question1.setDescription(Questions.get(0));
+                                Question1.setColor(Color);
+                                Question1.setFooter(Bot.WaterMark, Bot.Logo);
+                                applicant = e.getAuthor();
+                                DMS.sendMessage(Question1.build()).queue();
+                                CurrentQuestion = 1;
+                                responses.clear();
+
+
+                                SecondsPassed = 0;
+                                Timer myTimer = new Timer();
+                                TimerTask task = new TimerTask() {
+                                    public void run() {
+                                        SecondsPassed++;
+
+                                        while (SecondsPassed > (int) (Bot.ApplicationTimeoutTimeSECONDS) && SecondsPassed < 900000000) {
+                                            SecondsPassed = 0;
+                                            CurrentQuestion = -1;
+                                            EmbedBuilder ember = new EmbedBuilder()
+                                                    .setTitle("Application")
+                                                    .setDescription("Your current application has timed out!, after `" + Bot.ApplicationTimeoutTimeSECONDS + "` seconds of inactivity.")
+                                                    .setFooter(Bot.WaterMark, Bot.Logo)
+                                                    .setColor(Color.RED);
+                                            Bot.jda.getUserById(applicant.getId()).openPrivateChannel().complete().sendMessage(ember.build()).queue();
+                                            myTimer.cancel();
+                                        }
+                                        while (SecondsPassed >= 900000000) {
+                                            SecondsPassed = 0;
+                                            CurrentQuestion = -1;
+                                            myTimer.cancel();
+                                            responses.clear();
+                                            Questions.remove(Questions.size() - 1);
+
+                                        }
+                                    }
+                                };
+                                myTimer.scheduleAtFixedRate(task, 0, 1000);
+                                StopAllForLoops = true;
+                                j = ApplicationsList.size();
+
+                            } else {
+                                EmbedBuilder EmbedRules = new EmbedBuilder();
+                                EmbedRules.setTitle(BotName + " Applications");
+                                EmbedRules.setColor(Color);
+                                EmbedRules.addField("Error:", "**" + e.getMember().getUser().getAsTag() + "**, You already have an application submitted!", false);
+                                EmbedRules.setTimestamp(Bot.now);
+                                EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
+                                channel.sendMessage(EmbedRules.build()).queue(message1 -> {
+                                });
+                                StopAllForLoops = true;
+                                j = ApplicationsList.size();
+
+                            }
+                        }
+                    }
+                }
             } else {
                 final EmbedBuilder EmbedRules = new EmbedBuilder();
                 this.userID = e.getAuthor().getId();
@@ -199,6 +360,7 @@ public class TEST_Apps extends ListenerAdapter {
             e.getChannel().sendMessage(EmbedRules.build()).queue();
             this.CurrentQuestion = -1;
             this.responses.clear();
+            Questions.remove(Questions.size() - 1);
 
 
             SecondsPassed = 0;
@@ -209,7 +371,7 @@ public class TEST_Apps extends ListenerAdapter {
         if (CurrentQuestion != -1 && e.getAuthor().getId().equals(userID) && !e.getAuthor().isBot()) {
             if (CurrentQuestion < Questions.size()) {
                 EmbedBuilder Question = new EmbedBuilder();
-                if (CurrentQuestion < Questions.size()-1) {
+                if (CurrentQuestion < Questions.size() - 1) {
                     Question.setTitle("Question " + (CurrentQuestion + 1) + "/" + (Questions.size() - 1));
                 }
                 Question.setDescription(Questions.get(CurrentQuestion));
@@ -224,7 +386,7 @@ public class TEST_Apps extends ListenerAdapter {
                 SecondsPassed = 900000000;
 
                 EmbedBuilder QuestionFinished = new EmbedBuilder();
-                QuestionFinished.setDescription("**Review Submitted**");
+                QuestionFinished.setDescription("**Application Submitted**");
                 QuestionFinished.setColor(Color);
                 e.getChannel().sendMessage(QuestionFinished.build()).queue();
                 responses.add(e.getMessage().getContentRaw());
@@ -234,8 +396,6 @@ public class TEST_Apps extends ListenerAdapter {
                 for (int k = 0; k < responses.size(); k++) {
                     ResponsesStringLong = ResponsesStringLong + responses.get(k);
                 }
-                System.out.println(ResponsesStringLong);
-                System.out.println(responses.toString());
                 EmbedBuilder Embed = new EmbedBuilder();
                 EmbedBuilder EmbedBIG = new EmbedBuilder();
                 boolean isBig = false;
@@ -301,7 +461,7 @@ public class TEST_Apps extends ListenerAdapter {
                         ee.printStackTrace();
                     }
                     ApplicationInfo.add(userID);
-                    for (int k = 0; k < responses.size(); k++) {
+                    for (int k = 0; k < responses.size()-1; k++) {
                         ApplicationInfo.add(responses.get(k));
                     }
                     ApplicationsList.add(ApplicationInfo);
@@ -325,12 +485,13 @@ public class TEST_Apps extends ListenerAdapter {
 
                     ApplicationInfo.clear();
                     ApplicationsList.clear();
-
+                    Questions.remove(Questions.size() - 1);
+                    responses.clear();
+                    applicant = null;
+                    CurrentQuestion = -1;
 
                 }
-                responses.clear();
-                applicant = null;
-                CurrentQuestion = -1;
+
             }
 
 

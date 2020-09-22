@@ -56,9 +56,7 @@ public class Ticket_AdminOnly extends ListenerAdapter {
             BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
             BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
             ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
-            StaffPingEnabled = ((HashMap<String, Boolean>) json.get("GeneralConfig")).get("StaffPingEnabled");
-
-            TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
+TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
             TicketCreateCategoryChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateCategoryChannelID");
 
             MemberRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("MemberRoleID");
@@ -130,7 +128,6 @@ public class Ticket_AdminOnly extends ListenerAdapter {
                     EmbedBuilder EmbedRules = new EmbedBuilder();
                     EmbedRules.setTitle("Admin Only");
                     EmbedRules.setColor(Color);
-                    System.out.println((UsersAvatarURL));
                     EmbedRules.setThumbnail(UsersAvatarURL);
 
                     EmbedRules.setDescription("**" + e.getChannel().getName() + " was changed to Admin Only**");

@@ -2,14 +2,17 @@
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net  .dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import sun.net.www.ApplicationLaunchException;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -23,7 +26,30 @@ public class Application_Review extends ListenerAdapter {
         MessageChannel channel = e.getChannel();
         String[] message = e.getMessage().getContentRaw().split(" ");
         if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "review")) {
-            ArrayList<String> BlacklistedGet = new ArrayList<>(); if (new File("BlacklistedUsers.json").exists()) { try { JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json"))); BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers"); } catch (Exception ee) { ee.printStackTrace(); } } boolean isBlacklisted = false; for (String s : BlacklistedGet) { if (e.getAuthor().getId().equals(s)) { isBlacklisted = true; } } if (isBlacklisted) { EmbedBuilder UserBlacklisted = new EmbedBuilder() .setTitle("Error") .setThumbnail(Bot.BotLogo) .setFooter(Bot.WaterMark, Bot.BotLogo) .setTimestamp(Bot.now) .setColor(Color.RED) .setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*"); e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> { e.getMessage().delete().queue(); message3.addReaction("❌").queue(); message3.delete().queueAfter(10, TimeUnit.SECONDS); }); return; }
+            ArrayList<String> BlacklistedGet = new ArrayList<>();
+            if (new File("BlacklistedUsers.json").exists()) {
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                    BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+            }
+            boolean isBlacklisted = false;
+            for (String s : BlacklistedGet) {
+                if (e.getAuthor().getId().equals(s)) {
+                    isBlacklisted = true;
+                }
+            }
+            if (isBlacklisted) {
+                EmbedBuilder UserBlacklisted = new EmbedBuilder().setTitle("Error").setThumbnail(Bot.BotLogo).setFooter(Bot.WaterMark, Bot.BotLogo).setTimestamp(Bot.now).setColor(Color.RED).setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*");
+                e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> {
+                    e.getMessage().delete().queue();
+                    message3.addReaction("❌").queue();
+                    message3.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
         }
         boolean isAllowed = false;
         for (int i = 0; i < Bot.AllowedRoles.size(); i++) {
@@ -63,25 +89,6 @@ public class Application_Review extends ListenerAdapter {
 
 
                 ArrayList<ArrayList<String>> ApplicationsList = new ArrayList<>();
-                ArrayList<String> ApplicationInfo = new ArrayList<>();
-
-                String StringQuestion1 = "";
-                String StringQuestion2 = "";
-                String StringQuestion3 = "";
-                String StringQuestion4 = "";
-                String StringQuestion5 = "";
-                String StringQuestion6 = "";
-                String StringQuestion7 = "";
-                String StringQuestion8 = "";
-                String StringQuestion9 = "";
-                String StringQuestion10 = "";
-                String StringQuestion11 = "";
-                String StringQuestion12 = "";
-                String StringQuestion13 = "";
-                String StringQuestion14 = "";
-                String StringQuestion15 = "";
-                String StringQuestion16 = "";
-
                 if (new File("Applications.json").exists()) {
                     try {
                         JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Applications.json")));
@@ -89,79 +96,69 @@ public class Application_Review extends ListenerAdapter {
                     } catch (Exception ee) {
                         ee.printStackTrace();
                     }
-                    String ApplicantID = "";
-                    String part1Answers = "";
-                    for (int i = 0; i < ApplicationsList.size(); i++) {
-                        if (ApplicationsList.get(i).get(0).equals(Member.getId())) {
-                            ApplicantID = ApplicationsList.get(i).get(0);
-                            StringQuestion1 = ApplicationsList.get(i).get(1);
-                            StringQuestion2 = ApplicationsList.get(i).get(2);
-                            StringQuestion3 = ApplicationsList.get(i).get(3);
-                            StringQuestion4 = ApplicationsList.get(i).get(4);
-                            StringQuestion5 = ApplicationsList.get(i).get(5);
-                            StringQuestion6 = ApplicationsList.get(i).get(6);
-                            StringQuestion7 = ApplicationsList.get(i).get(7);
-                            StringQuestion8 = ApplicationsList.get(i).get(8);
-                            StringQuestion9 = ApplicationsList.get(i).get(9);
-                            StringQuestion10 = ApplicationsList.get(i).get(10);
-                            StringQuestion11 = ApplicationsList.get(i).get(10);
-                            StringQuestion12 = ApplicationsList.get(i).get(11);
-                            StringQuestion13 = ApplicationsList.get(i).get(12);
-                            StringQuestion14 = ApplicationsList.get(i).get(13);
-                            StringQuestion15 = ApplicationsList.get(i).get(14);
-                            StringQuestion16 = ApplicationsList.get(i).get(15);
-
-                        }
-                    }
-
-
-                    final EmbedBuilder CompletedResponses1 = new EmbedBuilder();
-                    final EmbedBuilder CompletedResponses3 = new EmbedBuilder();
-                    CompletedResponses1.setTitle("New Application from: " + e.getGuild().getMemberById(ApplicantID).getUser().getAsTag());
-                    CompletedResponses1.setColor(Color);
-                    CompletedResponses3.setColor(Color);
-                    CompletedResponses1.setThumbnail(e.getGuild().getMemberById(ApplicantID).getUser().getAvatarUrl());
-                    CompletedResponses1.addField("Discord: ", StringQuestion1, true);
-                    CompletedResponses1.addField("IGN: ", StringQuestion2, true);
-                    CompletedResponses1.addField("Timezone: ", StringQuestion3, true);
-                    CompletedResponses1.addField("Hours per Day:", StringQuestion5, true);
-                    CompletedResponses1.addField("Schematica: ", StringQuestion6, true);
-                    CompletedResponses1.addField("Breadcrumbs: ", StringQuestion7, true);
-                    CompletedResponses1.addField("Willing to ss:", StringQuestion12, true);
-                    CompletedResponses1.addField("Can Water Cannon:", StringQuestion14, true);
-                    CompletedResponses1.addField("Cannoning Skills", StringQuestion9, true);
-                    CompletedResponses1.addField("PvP Skills", StringQuestion10, true);
-                    CompletedResponses1.addField("What to do when getting raided A,B,C", StringQuestion16, true);
-
-                    CompletedResponses3.addField("Previous Factions:", StringQuestion4, true);
-                    CompletedResponses3.addField("Faction vouches:", StringQuestion15, true);
-                    CompletedResponses3.addField("Main Skill-Set", StringQuestion8, true);
-                    CompletedResponses3.addField("Explanation on how to patch:", StringQuestion11, true);
-                    CompletedResponses3.addField("How Would Contribute", StringQuestion13, true);
-                    final String Month1 = Bot.now.getMonth().toString().toLowerCase();
-                    final String Monthfirst = Month1.substring(0, 1).toUpperCase();
-                    final String Month2 = Monthfirst + Month1.substring(1);
-                    final String Week1 = Bot.now.getDayOfWeek().toString().toLowerCase();
-                    final String Weekfirst = Week1.substring(0, 1).toUpperCase();
-                    final String Week2 = Weekfirst + Week1.substring(1);
-                    CompletedResponses3.setFooter(Bot.WaterMark, Bot.Logo);
-
-                    CompletedResponses1.setDescription("**Applicant: **" + e.getGuild().getMemberById(ApplicantID).getUser().getAsTag() + "\n**Time Submitted:** " + Week2 + ", " + Month2 + " " + Bot.LocalTime.getDayOfMonth() + ", " + Bot.LocalTime.getYear());
-                    e.getChannel().sendMessage(CompletedResponses1.build()).queue();
-                    e.getChannel().sendMessage(CompletedResponses3.build()).queue();
-                    EmbedBuilder EmbedAccept = new EmbedBuilder()
-                            .setTitle("Application How-To")
-                            .addField("To **Accept** this application, please type: ", "`" + Bot.BotPrefix + "accept " + e.getGuild().getMemberById(ApplicantID).getUser().getAsMention() + " [@Role-To-Give]`", false)
-                            .addField("To **Deny** this application, please type:  ", "`" + Bot.BotPrefix + "deny " + e.getGuild().getMemberById(ApplicantID).getUser().getAsMention() + " [Reason]`", false)
-                            .setColor(Color)
-                            .setTimestamp(Bot.now)
-                            .setFooter(Bot.WaterMark, Bot.Logo);
-
-                    e.getChannel().sendMessage(EmbedAccept.build()).queue();
-
                 }
+                for (int j = 0; j < ApplicationsList.size(); j++) {
+                    if (ApplicationsList.get(j).get(0).equals(Member.getId())) {
+                        ArrayList<String> responses = ApplicationsList.get(j);
+                        ArrayList<String> Questions = Bot.ApplicationQuestions;
+                        ZonedDateTime LocalTime = Bot.now;
+                        String ResponsesStringLong = "";
+                        User applicant = e.getGuild().getMemberById(responses.get(0)).getUser();
+                        responses.remove(0);
 
+                        for (int k = 0; k < responses.size(); k++) {
+                            ResponsesStringLong = ResponsesStringLong + responses.get(k);
+                        }
+                        EmbedBuilder Embed = new EmbedBuilder();
+                        EmbedBuilder EmbedBIG = new EmbedBuilder();
+                        boolean isBig = false;
+                        if (ResponsesStringLong.length() > 1000) {
+                            EmbedBIG.setColor(Color);
+                            isBig = true;
+                            for (int i = (responses.size() / 2) - 1; i < responses.size() - 1; i++) {
 
+                                EmbedBIG.addField(Questions.get(i), responses.get(i), true);
+                            }
+                            for (int i = 0; i < (responses.size() - responses.size() / 2) - 1; i++) {
+
+                                Embed.addField(Questions.get(i), responses.get(i), true);
+                            }
+                            EmbedBIG.setTimestamp(LocalTime);
+                            EmbedBIG.setFooter(Bot.WaterMark, Bot.Logo);
+                        } else {
+                            for (int i = 0; i < responses.size() - 1; i++) {
+                                Embed.addField(Questions.get(i), responses.get(i), true);
+                            }
+                        }
+
+                        Embed.setColor(Color);
+                        Embed.setThumbnail(applicant.getAvatarUrl());
+                        Embed.setTimestamp(LocalTime);
+                        Embed.setFooter(Bot.WaterMark, Bot.Logo);
+                        final String Month1 = Bot.now.getMonth().toString().toLowerCase();
+                        final String Monthfirst = Month1.substring(0, 1).toUpperCase();
+                        final String Month2 = Monthfirst + Month1.substring(1);
+                        final String Week1 = Bot.now.getDayOfWeek().toString().toLowerCase();
+                        final String Weekfirst = Week1.substring(0, 1).toUpperCase();
+                        final String Week2 = Weekfirst + Week1.substring(1);
+                        Embed.setDescription("**Applicant: **" + applicant.getAsTag() + "\n**Time Submitted:** " + Week2 + ", " + Month2 + " " + Bot.LocalTime.getDayOfMonth() + ", " + Bot.LocalTime.getYear());
+                        if (isBig) {
+                            e.getChannel().sendMessage(Embed.build()).queue();
+                            e.getChannel().sendMessage(EmbedBIG.build()).queue();
+                        } else {
+                            e.getChannel().sendMessage(Embed.build()).complete();
+                        }
+                        EmbedBuilder EmbedAccept = new EmbedBuilder()
+                                .setTitle("Application How-To")
+                                .addField("To **Accept** this application, please type: ", "`" + Bot.BotPrefix + "accept " + applicant.getAsMention() + " [@Role-To-Give]`", false)
+                                .addField("To **Deny** this application, please type:  ", "`" + Bot.BotPrefix + "deny " + applicant.getAsMention() + " [Reason]`", false)
+                                .setColor(Color)
+                                .setTimestamp(Bot.now)
+                                .setFooter(Bot.WaterMark, Bot.Logo);
+                        Message INFO = e.getJDA().getGuildById(Bot.GuildID).getTextChannelById(Bot.ApplicationChannelID).sendMessage(EmbedAccept.build()).complete();
+                        return;
+                    }
+                }
             } else {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
                 EmbedRules.setTitle("Insufficient Permissions");

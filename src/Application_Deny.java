@@ -115,7 +115,6 @@ public class Application_Deny extends ListenerAdapter {
                         .setTimestamp(Bot.now)
                         .setFooter(Bot.WaterMark, Bot.Logo);
                 e.getGuild().getTextChannelById(Bot.LogsChannelID).sendMessage(logs.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
                 });
 
                 PrivateChannel DMS = e.getGuild().getMemberById(User.getId()).getUser().openPrivateChannel().complete();

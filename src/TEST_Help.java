@@ -70,26 +70,13 @@ public class TEST_Help extends ListenerAdapter {
             BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
             BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
             ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
-            StaffPingEnabled = ((HashMap<String, Boolean>) json.get("GeneralConfig")).get("StaffPingEnabled");
 
             TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
             TicketCreateCategoryChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateCategoryChannelID");
-
-
-            MemberRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("MemberRoleID");
-            SupportTeamRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("SupportTeamRoleID");
-            AdminRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("AdminRoleID");
         } catch (Exception ee) {
             ee.printStackTrace();
         }
         Color Color = java.awt.Color.decode(ColorHexCode);
-
-        boolean isAllowed = false;
-        if (e.getMember().getRoles().contains(e.getGuild().getRoleById(AdminRoleID)) ||
-                e.getMember().getRoles().contains(e.getGuild().getRoleById(SupportTeamRoleID)) ||
-                e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
-            isAllowed = true;
-        }
 
         if (e.getMessage().getContentRaw().equalsIgnoreCase(BotPrefix + "help")) {
 

@@ -52,9 +52,7 @@ public class Ticket_Rename extends ListenerAdapter {
             BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
             BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
             ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
-            StaffPingEnabled = ((HashMap<String, Boolean>) json.get("GeneralConfig")).get("StaffPingEnabled");
-
-            TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
+TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
             TicketCreateCategoryChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateCategoryChannelID");
 
             MemberRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("MemberRoleID");
@@ -175,7 +173,6 @@ public class Ticket_Rename extends ListenerAdapter {
                 channel.sendMessage(EmbedRules.build()).queue(message1 -> {
                     e.getMessage().delete().queue();
                 });
-                System.out.println(newTicketName + "-" + ticketID);
                 e.getChannel().getManager().setName(FinalTicketOutPut).queue();
 
                 JSONObject all = new JSONObject();

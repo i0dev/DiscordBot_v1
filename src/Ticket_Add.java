@@ -51,9 +51,7 @@ public class Ticket_Add extends ListenerAdapter {
                 BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
                 BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
                 ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
-                StaffPingEnabled = ((HashMap<String, Boolean>) json.get("GeneralConfig")).get("StaffPingEnabled");
-
-                TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
+    TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
                 TicketCreateCategoryChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateCategoryChannelID");
 
                 MemberRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("MemberRoleID");
@@ -80,7 +78,6 @@ public class Ticket_Add extends ListenerAdapter {
                     ee.printStackTrace();
                 }
             }
-            System.out.println(ChannelID);
             if (messageWithSplit[0].equalsIgnoreCase(BotPrefix + "add") && ChannelID.length() < 9) {
 
                 EmbedBuilder EmbedRules = new EmbedBuilder();

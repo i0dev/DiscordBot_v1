@@ -63,7 +63,30 @@ public class TEST_Polls extends ListenerAdapter {
         MessageChannel channel = e.getChannel();
         String[] message = e.getMessage().getContentRaw().split(" ");
         if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "polls")) {
-            ArrayList<String> BlacklistedGet = new ArrayList<>(); if (new File("BlacklistedUsers.json").exists()) { try { JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json"))); BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers"); } catch (Exception ee) { ee.printStackTrace(); } } boolean isBlacklisted = false; for (String s : BlacklistedGet) { if (e.getAuthor().getId().equals(s)) { isBlacklisted = true; } } if (isBlacklisted) { EmbedBuilder UserBlacklisted = new EmbedBuilder() .setTitle("Error") .setThumbnail(Bot.BotLogo) .setFooter(Bot.WaterMark, Bot.BotLogo) .setTimestamp(Bot.now) .setColor(Color.RED) .setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*"); e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> { e.getMessage().delete().queue(); message3.addReaction("❌").queue(); message3.delete().queueAfter(10, TimeUnit.SECONDS); }); return; }
+            ArrayList<String> BlacklistedGet = new ArrayList<>();
+            if (new File("BlacklistedUsers.json").exists()) {
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                    BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+            }
+            boolean isBlacklisted = false;
+            for (String s : BlacklistedGet) {
+                if (e.getAuthor().getId().equals(s)) {
+                    isBlacklisted = true;
+                }
+            }
+            if (isBlacklisted) {
+                EmbedBuilder UserBlacklisted = new EmbedBuilder().setTitle("Error").setThumbnail(Bot.BotLogo).setFooter(Bot.WaterMark, Bot.BotLogo).setTimestamp(Bot.now).setColor(Color.RED).setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*");
+                e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> {
+                    e.getMessage().delete().queue();
+                    message3.addReaction("❌").queue();
+                    message3.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
         }
         boolean isAllowed = false;
         for (int i = 0; i < Bot.AllowedRoles.size(); i++) {
@@ -284,93 +307,101 @@ public class TEST_Polls extends ListenerAdapter {
             Questions.clear();
             EmojiORDER.clear();
         }
+        if (applicant == null) {
+            return;
+        }
 
-        if (CurrentQuestion != -1 && e.getAuthor().getId().equals(applicant.getId()) && !e.getAuthor().isBot()) {
-            if (CurrentQuestion < Questions.size()) {
-                EmbedBuilder Question = new EmbedBuilder();
-                if (CurrentQuestion < Questions.size() - 1) {
-                    Question.setTitle("Question " + (CurrentQuestion + 1) + "/" + (Questions.size() - 1));
-                }
-                Question.setDescription(Questions.get(CurrentQuestion));
-                Question.setFooter(Bot.WaterMark, Bot.Logo);
-                Question.setColor(Color);
-                e.getChannel().sendMessage(Question.build()).queue();
-                SecondsPassed = 0;
-                CurrentQuestion++;
-                responses.add(e.getMessage().getContentRaw());
-                if (e.getMessage().getMentionedChannels().size() > 0 && CurrentQuestion == 2) {
-                    PollChannel = e.getMessage().getMentionedChannels().get(0);
-                }
-                if (e.getMessage().getEmotes().size() > 0) {
-                    EmojiORDER.add(e.getMessage().getEmotes().get(0));
-                }
-
-            } else if (CurrentQuestion == Questions.size()) {
-                SecondsPassed = 900000000;
-
-                EmbedBuilder QuestionFinished = new EmbedBuilder();
-                QuestionFinished.setDescription("**Poll Created!** in the " + responses.get(0) + " Channel!!");
-                QuestionFinished.setColor(Color);
-                e.getChannel().sendMessage(QuestionFinished.build()).queue();
-                responses.add(e.getMessage().getContentRaw());
-
-                EmbedBuilder Embed = new EmbedBuilder();
-                String Description = "";
-                Description = Description + responses.get(1);
-                Description = Description + "";
-                Description = Description + "\n\n";
-
-                for (int i = 2; i < responses.size(); i = i + 2) {
-                    OptionInOrder.add(responses.get(i));
-                }
-                for (int i = 3; i < responses.size(); i = i + 2) {
-                    EmojiInOrder.add(responses.get(i));
-                }
-                for (int d = 0; d < EmojiInOrder.size(); d++) {
-                    Description = Description + EmojiInOrder.get(d) + " » **" + OptionInOrder.get(d) + "**";
-                    Description = Description + "\n";
-                }
-                Description = Description + "\n";
-
-                Embed.setTitle("Incoming Poll!")
-                        .setColor(Color)
-                        .setThumbnail(BotLogo)
-                        .setTimestamp(LocalTime)
-                        .setFooter(Bot.WaterMark, BotLogo)
-                        .setDescription(Description);
-                Message Poll = null;
-                Message Pol2 = e.getChannel().sendMessage(Embed.build()).complete();
-                try {
-                    Poll = e.getJDA().getGuildById(PollChannel.getGuild().getId()).getTextChannelById(PollChannel.getId()).sendMessage(Embed.build()).complete();
-                } catch (Exception fe) {
-                    fe.printStackTrace();
-                }
-
-                for (int i = 0; i < EmojiInOrder.size(); i++) {
-                    String Emoji = EmojiInOrder.get(i);
-                    if (Emoji.contains("<") && Emoji.contains(">")) {
-                        Emoji = Emoji.substring(0, (Emoji.length() - 1));
-                    } else {
-                        if (Emoji.contains(":")) {
-                            Emoji = Emoji.substring(1, Emoji.length() - 1);
-
-                        } else {
-                            Emoji = EmojiInOrder.get(i);
+        if (CurrentQuestion != -1) {
+            if (!e.getAuthor().isBot()) {
+                if (CurrentQuestion < Questions.size()) {
+                    if (e.getAuthor().getId().equals(applicant.getId())) {
+                        EmbedBuilder Question = new EmbedBuilder();
+                        if (CurrentQuestion < Questions.size() - 1) {
+                            Question.setTitle("Question " + (CurrentQuestion + 1) + "/" + (Questions.size() - 1));
+                        }
+                        Question.setDescription(Questions.get(CurrentQuestion));
+                        Question.setFooter(Bot.WaterMark, Bot.Logo);
+                        Question.setColor(Color);
+                        e.getChannel().sendMessage(Question.build()).queue();
+                        SecondsPassed = 0;
+                        CurrentQuestion++;
+                        responses.add(e.getMessage().getContentRaw());
+                        if (e.getMessage().getMentionedChannels().size() > 0 && CurrentQuestion == 2) {
+                            PollChannel = e.getMessage().getMentionedChannels().get(0);
+                        }
+                        if (e.getMessage().getEmotes().size() > 0) {
+                            EmojiORDER.add(e.getMessage().getEmotes().get(0));
                         }
                     }
-                    Pol2.addReaction(Emoji).queue();
-                    Poll.addReaction(Emoji).queue();
+                } else if (CurrentQuestion == Questions.size() && CurrentQuestion != -1) {
+                    SecondsPassed = 900000000;
+
+                    EmbedBuilder QuestionFinished = new EmbedBuilder();
+                    QuestionFinished.setDescription("**Poll Created!** in the " + responses.get(0) + " Channel!!");
+                    QuestionFinished.setColor(Color);
+                    e.getChannel().sendMessage(QuestionFinished.build()).queue();
+                    responses.add(e.getMessage().getContentRaw());
+
+                    EmbedBuilder Embed = new EmbedBuilder();
+                    String Description = "";
+                    Description = Description + responses.get(1);
+                    Description = Description + "";
+                    Description = Description + "\n\n";
+
+                    for (int i = 2; i < responses.size(); i = i + 2) {
+                        OptionInOrder.add(responses.get(i));
+                    }
+                    for (int i = 3; i < responses.size(); i = i + 2) {
+                        EmojiInOrder.add(responses.get(i));
+                    }
+                    for (int d = 0; d < EmojiInOrder.size(); d++) {
+                        Description = Description + EmojiInOrder.get(d) + " » **" + OptionInOrder.get(d) + "**";
+                        Description = Description + "\n";
+                    }
+                    Description = Description + "\n";
+
+                    responses.clear();
+                    CurrentQuestion = -1;
+                    Questions.clear();
+                    EmojiInOrder.clear();
+                    EmojiORDER.clear();
+                    OptionInOrder.clear();
+
+                    Embed.setTitle("Incoming Poll!")
+                            .setColor(Color)
+                            .setThumbnail(BotLogo)
+                            .setTimestamp(LocalTime)
+                            .setFooter(Bot.WaterMark, BotLogo)
+                            .setDescription(Description);
+                    Message Poll = null;
+                    Message Pol2 = e.getChannel().sendMessage(Embed.build()).complete();
+                    try {
+                        Poll = e.getJDA().getGuildById(PollChannel.getGuild().getId()).getTextChannelById(PollChannel.getId()).sendMessage(Embed.build()).complete();
+                    } catch (Exception fe) {
+                        fe.printStackTrace();
+                    }
+
+                    for (int i = 0; i < EmojiInOrder.size(); i++) {
+                        String Emoji = EmojiInOrder.get(i);
+                        if (Emoji.contains("<") && Emoji.contains(">")) {
+                            Emoji = Emoji.substring(0, (Emoji.length() - 1));
+                        } else {
+                            if (Emoji.contains(":")) {
+                                Emoji = Emoji.substring(1, Emoji.length() - 1);
+
+                            } else {
+                                Emoji = EmojiInOrder.get(i);
+                            }
+                        }
+                        Pol2.addReaction(Emoji).queue();
+                        Poll.addReaction(Emoji).queue();
+                    }
+                    applicant = null;
+
+
                 }
 
-                responses.clear();
-                applicant = null;
-                CurrentQuestion = -1;
-                Questions.clear();
-                EmojiInOrder.clear();
-                EmojiORDER.clear();
-                OptionInOrder.clear();
             }
-
         }
     }
 }
