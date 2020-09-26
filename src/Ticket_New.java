@@ -36,7 +36,7 @@ public class Ticket_New extends ListenerAdapter {
     public String AdminRoleID = Bot.AdminRoleID;
     public String MemberRoleID = Bot.MemberRoleID;
 
-    public boolean StaffPingEnabled = Bot.StaffPingEnabled;
+    public boolean StaffPingEnabled = false;
 
 
     private String CurrentTicketNumber = "0";
@@ -52,7 +52,7 @@ public class Ticket_New extends ListenerAdapter {
             BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
             BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
             ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
-TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
+            TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
             TicketCreateCategoryChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateCategoryChannelID");
 
             MemberRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("MemberRoleID");
@@ -250,6 +250,7 @@ TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("
                         .addField("Please follow the format below:", "```" + QuestionsFormatString + "```", false)
                         .setTimestamp(LocalTime)
                         .setFooter("Ticket From " + e.getUser().getAsTag(), e.getMember().getUser().getAvatarUrl());
+
                 if (StaffPingEnabled) {
                     String Sing = e.getGuild().getRoleById(SupportTeamRoleID).getAsMention() + ", " + e.getMember().getAsMention();
                     NewTicketCreated.sendMessage(Sing).queue();

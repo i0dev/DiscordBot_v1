@@ -304,8 +304,8 @@ public class TEST_Polls extends ListenerAdapter {
             responses.clear();
             applicant = null;
             CurrentQuestion = -1;
-            Questions.clear();
             EmojiORDER.clear();
+            Questions.clear();
         }
         if (applicant == null) {
             return;
@@ -360,12 +360,6 @@ public class TEST_Polls extends ListenerAdapter {
                     }
                     Description = Description + "\n";
 
-                    responses.clear();
-                    CurrentQuestion = -1;
-                    Questions.clear();
-                    EmojiInOrder.clear();
-                    EmojiORDER.clear();
-                    OptionInOrder.clear();
 
                     Embed.setTitle("Incoming Poll!")
                             .setColor(Color)
@@ -397,8 +391,12 @@ public class TEST_Polls extends ListenerAdapter {
                         Poll.addReaction(Emoji).queue();
                     }
                     applicant = null;
-
-
+                    responses.clear();
+                    CurrentQuestion = -1;
+                    Questions.clear();
+                    EmojiInOrder.clear();
+                    EmojiORDER.clear();
+                    OptionInOrder.clear();
                 }
 
             }

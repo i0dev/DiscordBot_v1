@@ -60,6 +60,7 @@ public class Bot {
     public static boolean AppsEnabled;
     public static String TicketCreateChannelID = "";
     public static String TicketCreateCategoryChannelID = "";
+    public static String StrikeChannelID = "";
     public static String SuggestionChannelID = "";
 
     public static String SupportTeamRoleID = "";
@@ -99,11 +100,17 @@ public class Bot {
             new File("Tickets").mkdirs();
             loadDefaults();
         }
+        if (!new File("Tickets/TicketTop.json").exists()) {
+            new File("Tickets/TicketTop.json").createNewFile();
+        }
         if (!new File("Tickets/Storage").exists()) {
             new File("Tickets/Storage").mkdirs();
         }
         if (!new File("Warnings.json").exists()) {
             new File("Warnings.json").createNewFile();
+        }
+        if (!new File("SSList.json").exists()) {
+            new File("SSList.json").createNewFile();
         }
         if (!new File("Tickets/Logs").exists()) {
             new File("Tickets/Logs").mkdirs();
@@ -202,6 +209,7 @@ public class Bot {
         jda.addEventListener(new Ticket_Add());
         jda.addEventListener(new Ticket_Close());
         jda.addEventListener(new Ticket_Remove());
+        jda.addEventListener(new Ticket_TicketTop());
         jda.addEventListener(new Ticket_Info());
         jda.addEventListener(new Extra_Staff());
 
@@ -209,6 +217,7 @@ public class Bot {
         jda.addEventListener(new Extra_Warn());
 
         jda.addEventListener(new Extra_Promote());
+        jda.addEventListener(new Command_SSListAdd());
         jda.addEventListener(new Extra_Demote());
         jda.addEventListener(new Extra_Resign());
 
@@ -221,6 +230,7 @@ public class Bot {
         jda.addEventListener(new Extra_Assign());
         jda.addEventListener(new Extra_StaffClear());
         jda.addEventListener(new Extra_Confirm());
+        jda.addEventListener(new Extra_Strike());
 
         jda.addEventListener(new Fun_Slap());
         jda.addEventListener(new Fun_8Ball());
@@ -337,6 +347,7 @@ public class Bot {
         ChannelIDS.put("StaffMovementsChannelID", "751873062026346506");
         ChannelIDS.put("AdminLogsChannelID", "744580384423149734");
         ChannelIDS.put("ConfirmedFactionChannelID", "756166636402245763");
+        ChannelIDS.put("StrikeChannelID", "756166636402245763");
         ChannelIDS.put("BugReportChannelID", "751876990763794593");
         ChannelIDS.put("TicketCreateChannelID", "743324430067040396");
         ChannelIDS.put("TicketCreateCategoryChannelID", "744580337010475099");
@@ -418,7 +429,7 @@ public class Bot {
         }
         try {
             JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/config.json")));
-
+            StrikeChannelID= ((HashMap<String, String>) json.get("ChannelIDS")).get("StrikeChannelID");
             SupportTeamRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("SupportTeamRoleID");
             ConfirmedFactionChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("ConfirmedFactionChannelID");
             ApplicationQuestions = ((HashMap<String, ArrayList>) json.get("GeneralConfig")).get("ApplicationQuestions");

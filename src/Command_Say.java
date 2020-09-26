@@ -28,7 +28,7 @@ public class Command_Say extends ListenerAdapter {
         }
         boolean isAllowed = false;
         for (int i = 0; i < Bot.AllowedRoles.size(); i++) {
-            if (e.getMember().getRoles().contains(e.getGuild().getRoleById(Bot.AllowedRoles.get(i))) || e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
+            if (e.getMember().getRoles().contains(e.getGuild().getRoleById(Bot.AllowedRoles.get(i)))) {
                 isAllowed = true;
             }
         }

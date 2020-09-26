@@ -158,7 +158,7 @@ public class TEST_Apps extends ListenerAdapter {
         }
         if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "apply") && !e.getAuthor().isBot()) {
             if (CurrentQuestion == -1 || CurrentQuestion == 0) {
-                if (!AppsEnabled) {
+                if (AppsEnabled == false) {
                     EmbedBuilder EmbedRules = new EmbedBuilder();
                     EmbedRules.setTitle(BotName + " Applications");
                     EmbedRules.setColor(Color);
@@ -228,13 +228,14 @@ public class TEST_Apps extends ListenerAdapter {
                                             .setColor(Color.RED);
                                     Bot.jda.getUserById(applicant.getId()).openPrivateChannel().complete().sendMessage(ember.build()).queue();
                                     myTimer.cancel();
+                                    Questions.remove(Questions.size() - 1);
+
                                 }
                                 while (SecondsPassed >= 900000000) {
                                     SecondsPassed = 0;
                                     CurrentQuestion = -1;
                                     myTimer.cancel();
                                     responses.clear();
-                                    Questions.remove(Questions.size() - 1);
 
                                 }
                             }
@@ -301,13 +302,14 @@ public class TEST_Apps extends ListenerAdapter {
                                                     .setColor(Color.RED);
                                             Bot.jda.getUserById(applicant.getId()).openPrivateChannel().complete().sendMessage(ember.build()).queue();
                                             myTimer.cancel();
+                                            Questions.remove(Questions.size() - 1);
+
                                         }
                                         while (SecondsPassed >= 900000000) {
                                             SecondsPassed = 0;
                                             CurrentQuestion = -1;
                                             myTimer.cancel();
                                             responses.clear();
-                                            Questions.remove(Questions.size() - 1);
 
                                         }
                                     }
@@ -461,10 +463,14 @@ public class TEST_Apps extends ListenerAdapter {
                         ee.printStackTrace();
                     }
                     ApplicationInfo.add(userID);
-                    for (int k = 0; k < responses.size()-1; k++) {
+                    System.out.println(responses.toString());
+                    System.out.println(responses.size());
+
+                    for (int k = 0; k < responses.size() - 1; k++) {
                         ApplicationInfo.add(responses.get(k));
                     }
                     ApplicationsList.add(ApplicationInfo);
+                    System.out.println(ApplicationsList.toString());
 
 
                     if (new File("Applications.json").exists()) {
@@ -482,13 +488,15 @@ public class TEST_Apps extends ListenerAdapter {
                             exception.printStackTrace();
                         }
                     }
+                    SecondsPassed = 900000000;
 
                     ApplicationInfo.clear();
                     ApplicationsList.clear();
-                    Questions.remove(Questions.size() - 1);
                     responses.clear();
                     applicant = null;
                     CurrentQuestion = -1;
+                    Questions.remove(Questions.size() - 1);
+
 
                 }
 

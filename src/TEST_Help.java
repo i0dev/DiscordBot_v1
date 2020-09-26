@@ -177,7 +177,7 @@ public class TEST_Help extends ListenerAdapter {
                                     "**" + Bot.BotPrefix + "kick** [user] > Kicks the user.\n" +
                                     "**" + Bot.BotPrefix + "members** [@Role] > Lists all members with that role.\n" +
                                     "**" + Bot.BotPrefix + "unban** [user] > Un-Bans the user.\n" +
-                                    "**" + Bot.BotPrefix + "prune** <user> [messages] > Deletes that many amount of messages in that channel\n" +
+                                    "**" + Bot.BotPrefix + "prune** [messages] <@user> > Deletes that many amount of messages in that channel\n" +
                                     "**" + Bot.BotPrefix + "mute** [user] [reason] > mutes the user.\n" +
                                     "**" + Bot.BotPrefix + "unmute** [user] [reason] > unmutes the user.\n" +
                                     "**" + Bot.BotPrefix + "announce** [#channel] [announcement] > sends an announcement to that channel\n" +
@@ -185,8 +185,11 @@ public class TEST_Help extends ListenerAdapter {
                                     "**" + Bot.BotPrefix + "getMuted** > Gets all muted users\n" +
                                     "**" + Bot.BotPrefix + "Blacklist [@User]** > Blacklists that user from using ALL commands\n" +
                                     "**" + Bot.BotPrefix + "UnBlacklist [@User]** > UnBlacklists that user from using ALL commands\n" +
-                                    "**" + Bot.BotPrefix + "GetBlacklisted [@User]** > Lists all the currently blacklisted users\n"
-
+                                    "**" + Bot.BotPrefix + "GetBlacklisted** > Lists all the currently blacklisted users\n" +
+                                    "**" + Bot.BotPrefix + "Strike [Faction Name] [Points Given] [Value Removed] [Total Points] [Reason]** > Strikes that faction\n" +
+                                    "**" + Bot.BotPrefix + "ss add [Ign] [reason]** > Adds that IGN to the SS List\n" +
+                                    "**" + Bot.BotPrefix + "ss remove [Ign]** > Removes that IGN to the SS List\n" +
+                                    "**" + Bot.BotPrefix + "ss list** > Shows the current SS List\n"
 
                             , false)
                     .setTimestamp(LocalTime)
@@ -218,7 +221,8 @@ public class TEST_Help extends ListenerAdapter {
                                     "**" + BotPrefix + "FacLeader [@User]** **→** Gives that user Faction Leader Role\n" +
                                     "**" + BotPrefix + "Confirm [@Leader] [Faction Name] [Roster Size]** **→** Confirms that faction as playing\n" +
                                     "**" + BotPrefix + "Poll [Number Of Options]** **→** Starts the Poll-Creator in DMS\n" +
-                                    "**" + BotPrefix + "Clear** **→** Clears nearly all messages in a channel\n"
+                                    "**" + BotPrefix + "Clear** **→** Clears nearly all messages in a channel\n" +
+                                    "**" + BotPrefix + "TicketTop** **→** Get's the top closed tickets!\n"
 
 
                             , false)

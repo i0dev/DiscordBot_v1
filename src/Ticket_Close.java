@@ -58,7 +58,7 @@ public class Ticket_Close extends ListenerAdapter {
             BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
             BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
             ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
-TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
+            TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
             TicketCreateCategoryChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateCategoryChannelID");
             AdminLogsChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("AdminLogsChannelID");
             TicketLogsChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketLogsChannelID");
@@ -95,7 +95,30 @@ TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("
         String[] message = e.getMessage().getContentDisplay().split(" ");
         String[] messageWithSplit = e.getMessage().getContentRaw().split(" ");
         if (messageWithSplit.length > 0 && messageWithSplit[0].equalsIgnoreCase(Bot.BotPrefix + "close")) {
-            ArrayList<String> BlacklistedGet = new ArrayList<>(); if (new File("BlacklistedUsers.json").exists()) { try { JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json"))); BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers"); } catch (Exception ee) { ee.printStackTrace(); } } boolean isBlacklisted = false; for (String s : BlacklistedGet) { if (e.getAuthor().getId().equals(s)) { isBlacklisted = true; } } if (isBlacklisted) { EmbedBuilder UserBlacklisted = new EmbedBuilder() .setTitle("Error") .setThumbnail(Bot.BotLogo) .setFooter(Bot.WaterMark, Bot.BotLogo) .setTimestamp(Bot.now) .setColor(Color.RED) .setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*"); e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> { e.getMessage().delete().queue(); message3.addReaction("❌").queue(); message3.delete().queueAfter(10, TimeUnit.SECONDS); }); return; }
+            ArrayList<String> BlacklistedGet = new ArrayList<>();
+            if (new File("BlacklistedUsers.json").exists()) {
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                    BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+            }
+            boolean isBlacklisted = false;
+            for (String s : BlacklistedGet) {
+                if (e.getAuthor().getId().equals(s)) {
+                    isBlacklisted = true;
+                }
+            }
+            if (isBlacklisted) {
+                EmbedBuilder UserBlacklisted = new EmbedBuilder().setTitle("Error").setThumbnail(Bot.BotLogo).setFooter(Bot.WaterMark, Bot.BotLogo).setTimestamp(Bot.now).setColor(Color.RED).setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*");
+                e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> {
+                    e.getMessage().delete().queue();
+                    message3.addReaction("❌").queue();
+                    message3.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
         }
         if (message[0].equalsIgnoreCase(BotPrefix + "close")) {
 
@@ -188,6 +211,49 @@ TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("
                 }
 
 
+                Member MentionedMember = e.getMember();
+                long CurrnetWarningCount = 1;
+                ArrayList<ArrayList<Long>> IDMatcher = new ArrayList<>();
+                ArrayList<Long> IDMatcherInt = new ArrayList<>();
+
+                if (new File("Tickets/TicketTop.json").exists()) {
+                    try {
+                        JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/TicketTop.json")));
+                        IDMatcher = (ArrayList<ArrayList<Long>>) json.get("TicketTop");
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                    for (int i = 0; i < IDMatcher.size(); i++) {
+                        if (IDMatcher.get(i).get(0).equals(MentionedMember.getIdLong())) {
+                            CurrnetWarningCount = IDMatcher.get(i).get(1);
+                            CurrnetWarningCount++;
+                            IDMatcher.remove(i);
+                        }
+                    }
+                    IDMatcherInt.add(MentionedMember.getIdLong());
+                    IDMatcherInt.add(CurrnetWarningCount);
+                    IDMatcher.add(IDMatcherInt);
+
+
+                    if (new File("Tickets/TicketTop.json").exists()) {
+                        try {
+
+                            JSONObject all = new JSONObject();
+                            all.put("TicketTop", IDMatcher);
+
+                            try {
+                                Files.write(Paths.get("Tickets/TicketTop.json"), all.toJSONString().getBytes());
+                            } catch (Exception ef) {
+                                ef.printStackTrace();
+                            }
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+
+                }
+
+
                 try {
                     MessageChannel memberPrivate = e.getGuild().getMemberById(UsersID).getUser().openPrivateChannel().complete();
                     EmbedBuilder EmbedRules = new EmbedBuilder();
@@ -259,7 +325,7 @@ TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("
             BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
             BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
             ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
-TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
+            TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
             TicketCreateCategoryChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateCategoryChannelID");
             AdminLogsChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("AdminLogsChannelID");
             TicketLogsChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketLogsChannelID");
@@ -407,6 +473,49 @@ TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("
                 ClosedReason = "No Reason Provided.";
                 EmbedRules1.setTimestamp(Bot.LocalTime);
                 EmbedRules1.setFooter("Closed By " + e.getUser().getAsTag(), e.getMember().getUser().getAvatarUrl());
+
+
+                Member MentionedMember = e.getMember();
+                long CurrnetWarningCount = 1;
+                ArrayList<ArrayList<Long>> IDMatcher = new ArrayList<>();
+                ArrayList<Long> IDMatcherInt = new ArrayList<>();
+
+                if (new File("Tickets/TicketTop.json").exists()) {
+                    try {
+                        JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/TicketTop.json")));
+                        IDMatcher = (ArrayList<ArrayList<Long>>) json.get("TicketTop");
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                    for (int i = 0; i < IDMatcher.size(); i++) {
+                        if (IDMatcher.get(i).get(0).equals(MentionedMember.getIdLong())) {
+                            CurrnetWarningCount = IDMatcher.get(i).get(1);
+                            CurrnetWarningCount++;
+                            IDMatcher.remove(i);
+                        }
+                    }
+                    IDMatcherInt.add(MentionedMember.getIdLong());
+                    IDMatcherInt.add(CurrnetWarningCount);
+                    IDMatcher.add(IDMatcherInt);
+
+
+                    if (new File("Tickets/TicketTop.json").exists()) {
+                        try {
+
+                            JSONObject all = new JSONObject();
+                            all.put("TicketTop", IDMatcher);
+
+                            try {
+                                Files.write(Paths.get("Tickets/TicketTop.json"), all.toJSONString().getBytes());
+                            } catch (Exception ef) {
+                                ef.printStackTrace();
+                            }
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+
+                }
 
 
                 if (AdminOnlyMode) {
