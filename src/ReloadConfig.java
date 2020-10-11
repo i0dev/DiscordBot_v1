@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
-public class Extra_StaffClear extends ListenerAdapter {
+public class ReloadConfig extends ListenerAdapter {
     public String BotPrefix = Bot.BotPrefix;
     public String BotName = Bot.BotName;
     public ZonedDateTime LocalTime = ZonedDateTime.now();
@@ -48,12 +48,11 @@ public class Extra_StaffClear extends ListenerAdapter {
             JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/config.json")));
             BotPrefix = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotPrefix");
             BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
-            ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
             BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
+            ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
             StaffMovementsChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("StaffMovementsChannelID");
             AdminRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("AdminRoleID");
             StaffRoleIDS = ((HashMap<String, ArrayList>) json.get("GeneralConfig")).get("StaffRoleIDS");
-
         } catch (Exception ee) {
             ee.printStackTrace();
         }
@@ -61,7 +60,7 @@ public class Extra_StaffClear extends ListenerAdapter {
         Color Color = java.awt.Color.decode(ColorHexCode);
         MessageChannel channel = e.getChannel();
         String[] message = e.getMessage().getContentRaw().split(" ");
-        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "staffclear")) {
+        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "reload")) {
             ArrayList<String> BlacklistedGet = new ArrayList<>();
             if (new File("BlacklistedUsers.json").exists()) {
                 try {
@@ -93,17 +92,20 @@ public class Extra_StaffClear extends ListenerAdapter {
                 isAllowed = true;
             }
         }
-        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "StaffClear")) {
+        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "reload")) {
             if (isAllowed) {
+                Bot.loadStorage();
                 EmbedBuilder EmbedRules = new EmbedBuilder();
-                EmbedRules.setTitle("Incorrect Format");
+                EmbedRules.setTitle("Reloaded Config");
                 EmbedRules.setColor(Color);
-                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "StaffClear [@User] <-s>", false);
+                EmbedRules.addField("Success:", "**" + e.getAuthor().getName() + "**, You have reloaded all the config!", false);
                 EmbedRules.setTimestamp(now);
                 EmbedRules.setFooter(Bot.WaterMark, BotLogo);
                 channel.sendMessage(EmbedRules.build()).queue(message1 -> {
                     e.getMessage().delete().queue();
                 });
+
+
             } else {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
                 EmbedRules.setTitle("Insufficient Permissions");
@@ -116,82 +118,5 @@ public class Extra_StaffClear extends ListenerAdapter {
                 });
             }
         }
-
-        if ((message.length == 2 || message.length == 3) && message[0].equalsIgnoreCase(Bot.BotPrefix + "StaffClear")) {
-            if (isAllowed) {
-                if (e.getMessage().getContentRaw().contains(" -s")) {
-
-
-                    User MentionedUser = e.getMessage().getMentionedUsers().get(0);
-                    Member MentionedMember = e.getMessage().getMentionedMembers().get(0);
-
-
-                    for (int i = 0; i < StaffRoleIDS.size(); i++) {
-
-                        if (MentionedMember.getRoles().contains(e.getGuild().getRoleById(StaffRoleIDS.get(i)))) {
-                            e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i))).queue();
-                        }
-                    }
-                    e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
-
-
-                    EmbedBuilder EmbedFirst = new EmbedBuilder()
-                            .setTitle("Successfully Removed " + MentionedUser.getAsTag())
-                            .setColor(Color)
-                            .addField("Success", e.getMember().getUser().getAsTag() + ", you have  __*Silently*__ Removed " + MentionedMember.getUser().getAsTag(), false)
-                            .setTimestamp(now)
-                            .setFooter(Bot.WaterMark, BotLogo);
-                    channel.sendMessage(EmbedFirst.build()).queue(message1 -> {
-                        e.getMessage().delete().queue();
-                    });
-
-                } else {
-
-                    User MentionedUser = e.getMessage().getMentionedUsers().get(0);
-                    Member MentionedMember = e.getMessage().getMentionedMembers().get(0);
-
-
-                    for (int i = 0; i < StaffRoleIDS.size(); i++) {
-
-                        if (MentionedMember.getRoles().contains(e.getGuild().getRoleById(StaffRoleIDS.get(i)))) {
-                            e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i))).queue();
-                        }
-                    }
-                    e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
-
-
-                    EmbedBuilder EmbedFirst = new EmbedBuilder()
-                            .setTitle("Successfully Removed " + MentionedUser.getAsTag())
-                            .setColor(Color)
-                            .addField("Success", e.getMember().getUser().getAsTag() + ", you have Removed " + MentionedMember.getUser().getAsTag(), false)
-                            .setTimestamp(now)
-                            .setFooter(Bot.WaterMark, BotLogo);
-                    channel.sendMessage(EmbedFirst.build()).queue();
-
-                    EmbedBuilder Embed = new EmbedBuilder()
-                            .setTitle("Staff Movement")
-                            .setColor(Color)
-                            .addField("Remove", "**" + MentionedMember.getUser().getAsTag() + "**" + " has been Removed by " + "**" + e.getAuthor().getAsTag() + "**", false)
-                            .setTimestamp(now)
-                            .setFooter(Bot.WaterMark, BotLogo);
-                    e.getGuild().getTextChannelById(StaffMovementsChannelID).sendMessage(Embed.build()).queue(message1 -> {
-                        e.getMessage().delete().queue();
-                    });
-                }
-
-            } else {
-                EmbedBuilder EmbedRules = new EmbedBuilder();
-                EmbedRules.setTitle("Insufficient Permissions");
-                EmbedRules.setColor(Color);
-                EmbedRules.addField("Error:", "You do not have permission to run this command!", false);
-                EmbedRules.setTimestamp(now);
-                EmbedRules.setFooter(Bot.WaterMark, BotLogo);
-                channel.sendMessage(EmbedRules.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
-                });
-
-            }
-        }
-
     }
 }

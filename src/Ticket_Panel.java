@@ -35,7 +35,30 @@ public class Ticket_Panel extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
         String[] messageWithSplit = e.getMessage().getContentRaw().split(" ");
         if (messageWithSplit.length > 0 && messageWithSplit[0].equalsIgnoreCase(Bot.BotPrefix + "ticket_panel")) {
-            ArrayList<String> BlacklistedGet = new ArrayList<>(); if (new File("BlacklistedUsers.json").exists()) { try { JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json"))); BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers"); } catch (Exception ee) { ee.printStackTrace(); } } boolean isBlacklisted = false; for (String s : BlacklistedGet) { if (e.getAuthor().getId().equals(s)) { isBlacklisted = true; } } if (isBlacklisted) { EmbedBuilder UserBlacklisted = new EmbedBuilder() .setTitle("Error") .setThumbnail(Bot.BotLogo) .setFooter(Bot.WaterMark, Bot.BotLogo) .setTimestamp(Bot.now) .setColor(Color.RED) .setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*"); e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> { e.getMessage().delete().queue(); message3.addReaction("❌").queue(); message3.delete().queueAfter(10, TimeUnit.SECONDS); }); return; }
+            ArrayList<String> BlacklistedGet = new ArrayList<>();
+            if (new File("BlacklistedUsers.json").exists()) {
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                    BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+            }
+            boolean isBlacklisted = false;
+            for (String s : BlacklistedGet) {
+                if (e.getAuthor().getId().equals(s)) {
+                    isBlacklisted = true;
+                }
+            }
+            if (isBlacklisted) {
+                EmbedBuilder UserBlacklisted = new EmbedBuilder().setTitle("Error").setThumbnail(Bot.BotLogo).setFooter(Bot.WaterMark, Bot.BotLogo).setTimestamp(Bot.now).setColor(Color.RED).setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*");
+                e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> {
+                    e.getMessage().delete().queue();
+                    message3.addReaction("❌").queue();
+                    message3.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
         }
         try {
             JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/config.json")));
@@ -43,7 +66,7 @@ public class Ticket_Panel extends ListenerAdapter {
             BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
             BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
             ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
-TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
+            TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
             TicketCreateCategoryChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateCategoryChannelID");
 
             MemberRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("MemberRoleID");
@@ -55,6 +78,18 @@ TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("
             ee.printStackTrace();
         }
         java.awt.Color Color = java.awt.Color.decode(ColorHexCode);
+        if (e.getMessage().getContentRaw().equalsIgnoreCase(BotPrefix + "ticket_panel") &&
+                !e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
+            EmbedBuilder EmbedRules = new EmbedBuilder();
+            EmbedRules.setTitle("Insufficient Permissions");
+            EmbedRules.setColor(Color);
+            EmbedRules.addField("Error:", "You do not have permission to run this command!", false);
+            EmbedRules.setTimestamp(LocalTime);
+            EmbedRules.setFooter(Bot.WaterMark, BotLogo);
+            e.getChannel().sendMessage(EmbedRules.build()).queue(message1 -> {
+                e.getMessage().delete().queue();
+            });
+        }
 
         if (e.getMessage().getContentRaw().equalsIgnoreCase(BotPrefix + "ticket_panel") &&
                 e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {

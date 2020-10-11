@@ -144,7 +144,7 @@ public class Extra_Resign extends ListenerAdapter {
                     channel.sendMessage(EmbedFirst.build()).queue();
 
                     EmbedBuilder Embed = new EmbedBuilder()
-                            .setTitle("Incoming Staff Movement!")
+                            .setTitle("Staff Movement")
                             .setColor(Color)
                             .addField("Resignation", "**" + MentionedMember.getUser().getAsTag() + "** has resigned", false)
                             .setTimestamp(now)

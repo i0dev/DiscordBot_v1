@@ -1,7 +1,10 @@
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -15,9 +18,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
+import java.util.Timer;
 
 public class Bot {
 
@@ -70,7 +76,8 @@ public class Bot {
     public static ArrayList<String> LightAllowedRoleIDS = new ArrayList<>();
     public static String MemberRoleID = "";
 
-    public static String[] BlockedWordsList = {"nigger", "faggot", "n1gger", "n1g3r", "nigga", "n1gga", "niga"};
+    public static ArrayList<String> BlockedWordsList = new ArrayList<>();
+
 
     public static void main(String args[]) throws Exception {
 
@@ -88,6 +95,9 @@ public class Bot {
         }
         if (!new File("BlacklistedUsers.json").exists()) {
             new File("BlacklistedUsers.json").createNewFile();
+        }
+        if (!new File("Giveaways.json").exists()) {
+            new File("Giveaways.json").createNewFile();
         }
         if (!new File("config.json").exists()) {
             new File("config.json").createNewFile();
@@ -161,29 +171,23 @@ public class Bot {
         } catch (LoginException e) {
             e.printStackTrace();
         }
+        Timer myTimer = new Timer();
+
+        myTimer.scheduleAtFixedRate(task, 0, 60000);
 
 
-        //  jda.addEventListener(new Applications_New());
         jda.addEventListener(new Application_Accept());
         jda.addEventListener(new Application_Deny());
         jda.addEventListener(new Application_Review());
         jda.addEventListener(new Application_List());
-
         jda.addEventListener(new Event_Welcome());
-
         jda.addEventListener(new Command_Announcements());
         jda.addEventListener(new Command_IP());
-
         jda.addEventListener(new Command_Mute());
-        // jda.addEventListener(new Command_TempMute());
         jda.addEventListener(new Command_UnMute());
-
         jda.addEventListener(new Command_Ban());
         jda.addEventListener(new Command_Kick());
         jda.addEventListener(new Command_Unban());
-
-
-        //eXTRAS
         jda.addEventListener(new Auto_Mod());
         jda.addEventListener(new Command_MemberCount());
         jda.addEventListener(new Command_Prune());
@@ -193,14 +197,10 @@ public class Bot {
         jda.addEventListener(new Command_WhoIs());
         jda.addEventListener(new Command_Roles());
         jda.addEventListener(new Command_Avatar());
-
         jda.addEventListener(new Command_GetMuted());
-        //   jda.addEventListener(new Command_Help());
         jda.addEventListener(new Command_Invites());
         jda.addEventListener(new Command_Members());
-
         jda.addEventListener(new Extra_Verify());
-
         jda.addEventListener(new Ticket_Panel());
         jda.addEventListener(new Ticket_New());
         jda.addEventListener(new Ticket_AdminOnly());
@@ -212,26 +212,22 @@ public class Bot {
         jda.addEventListener(new Ticket_TicketTop());
         jda.addEventListener(new Ticket_Info());
         jda.addEventListener(new Extra_Staff());
-
         jda.addEventListener(new Extra_GetWarns());
         jda.addEventListener(new Extra_Warn());
-
         jda.addEventListener(new Extra_Promote());
+        jda.addEventListener(new ReloadConfig());
         jda.addEventListener(new Command_SSListAdd());
         jda.addEventListener(new Extra_Demote());
         jda.addEventListener(new Extra_Resign());
-
         jda.addEventListener(new Extra_Suggest());
         jda.addEventListener(new Extra_FacLEader());
         jda.addEventListener(new Extra_BugReport());
-
         jda.addEventListener(new TEST_Apps());
         jda.addEventListener(new TEST_Help());
         jda.addEventListener(new Extra_Assign());
         jda.addEventListener(new Extra_StaffClear());
         jda.addEventListener(new Extra_Confirm());
         jda.addEventListener(new Extra_Strike());
-
         jda.addEventListener(new Fun_Slap());
         jda.addEventListener(new Fun_8Ball());
         jda.addEventListener(new Fun_CoinFlip());
@@ -239,7 +235,11 @@ public class Bot {
         jda.addEventListener(new Fun_Hi());
         jda.addEventListener(new Fun_Pat());
         jda.addEventListener(new TEST_Polls());
-
+        jda.addEventListener(new TEST_Giveaways());
+        jda.addEventListener(new TEST_GiveawayReRoll());
+        jda.addEventListener(new TEST_GiveawaysList());
+        jda.addEventListener(new TEST_GiveawayDelete());
+        jda.addEventListener(new TEST_GiveawayEnd());
         jda.addEventListener(new Extra_UnBlacklist());
         jda.addEventListener(new Extra_GetBlacklisted());
         jda.addEventListener(new Extra_Blacklist());
@@ -363,7 +363,12 @@ public class Bot {
         GeneralConfig.put("AppsEnabled", true);
         GeneralConfig.put("BotPrefix", ".");
         GeneralConfig.put("TicketPanelOverAllDescription", "Click to one of the emojis to create a corresponding ticket!");
-        GeneralConfig.put("BotToken", "");
+        ArrayList<String> BlockedWordsDefault = new ArrayList<>();
+        BlockedWordsDefault.add("nigger");
+        BlockedWordsDefault.add("faggot");
+        BlockedWordsDefault.add("n1gger");
+        BlockedWordsDefault.add("nigga");
+        GeneralConfig.put("BlockedWordsList", BlockedWordsDefault);
         GeneralConfig.put("BotName", "i0dev");
         GeneralConfig.put("BotActivity", "i0dev.com | .help");
         GeneralConfig.put("BotLogo", "https://cdn.discordapp.com/attachments/667207717882036234/746181096995291156/i01.png");
@@ -395,6 +400,7 @@ public class Bot {
     }
 
     public static void loadStorage() {
+
         try {
             JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("config.json")));
 
@@ -429,17 +435,140 @@ public class Bot {
         }
         try {
             JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/config.json")));
-            StrikeChannelID= ((HashMap<String, String>) json.get("ChannelIDS")).get("StrikeChannelID");
+            StrikeChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("StrikeChannelID");
             SupportTeamRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("SupportTeamRoleID");
             ConfirmedFactionChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("ConfirmedFactionChannelID");
             ApplicationQuestions = ((HashMap<String, ArrayList>) json.get("GeneralConfig")).get("ApplicationQuestions");
             LightAllowedRoleIDS = ((HashMap<String, ArrayList<String>>) json.get("RoleIDS")).get("LightAllowedRolesList");
             AutoModChannelIDS = ((HashMap<String, ArrayList<String>>) json.get("ChannelIDS")).get("AutoModChannelIDS");
-
+            TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
+            BlockedWordsList = ((HashMap<String, ArrayList<String>>) json.get("GeneralConfig")).get("BlockedWordsList");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
+    public static TimerTask task = new TimerTask() {
+        public void run() {
+            ArrayList<JSONObject> ArrayOfGiveaways = new ArrayList<>();
+            try {
+                JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Giveaways.json")));
+                ArrayOfGiveaways = (ArrayList<JSONObject>) json.get("Giveaways");
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+
+            for (int i = 0; i < ArrayOfGiveaways.size(); i++) {
+                String CurrentGiveawayEndTime = ArrayOfGiveaways.get(i).get("EndTimeMillis").toString();
+                long longEndTime = Long.parseLong(CurrentGiveawayEndTime);
+                boolean GiveawayFinished = (boolean) ArrayOfGiveaways.get(i).get("GiveawayEnded");
+
+                if (System.currentTimeMillis() >= longEndTime && System.currentTimeMillis() <= longEndTime + 60000 && !GiveawayFinished) {
+
+
+                    String CurrentGuildID = ArrayOfGiveaways.get(i).get("GuildID").toString();
+                    String CurrentChannelID = ArrayOfGiveaways.get(i).get("ChannelID").toString();
+                    String CurrentMessageID = ArrayOfGiveaways.get(i).get("MessageID").toString();
+                    String CurrentHostID = ArrayOfGiveaways.get(i).get("HostID").toString();
+                    String CurrentReward = ArrayOfGiveaways.get(i).get("Reward").toString();
+                    String CurrentWinnersAmount = ArrayOfGiveaways.get(i).get("WinnersAmount").toString();
+                    String CurrentBotLogo = ArrayOfGiveaways.get(i).get("BotLogo").toString();
+                    String CurrentColorHexCode = ArrayOfGiveaways.get(i).get("CurrentColorHexCode").toString();
+                    String CurrentGiveawayEndTimeFormat = ArrayOfGiveaways.get(i).get("EndTimeFormat").toString();
+
+                    Color Color = java.awt.Color.decode(CurrentColorHexCode);
+
+                    Instant EndInstant = Instant.ofEpochMilli(longEndTime);
+                    ZonedDateTime FinalDate = ZonedDateTime.ofInstant(EndInstant, ZoneId.systemDefault());
+
+                    List<User> MembersReacted = new ArrayList<>();
+                    List<User> MembersReactedInitial = new ArrayList<>();
+                    Message message = Bot.jda.getGuildById(CurrentGuildID).getTextChannelById(CurrentChannelID).retrieveMessageById(CurrentMessageID).complete();
+                    MembersReactedInitial = message.retrieveReactionUsers("🎉").complete();
+
+                    for (int f = 0; f < MembersReactedInitial.size(); f++) {
+                        if (!MembersReactedInitial.get(f).isBot()) {
+                            MembersReacted.add(MembersReactedInitial.get(f));
+                        }
+                    }
+                    String WinnersString = "";
+                    ArrayList<User> Winners = new ArrayList<>();
+                    if (MembersReacted.size() == 0) {
+                        WinnersString = "`No Winners :cry:`";
+                    } else {
+                        Random random = new Random();
+                        for (int j = 0; j < Integer.parseInt(CurrentWinnersAmount); j++) {
+                            int randomint = random.nextInt(MembersReacted.size());
+                            try {
+                                Winners.add(MembersReacted.get(randomint));
+                            } catch (Exception error) {
+
+                            }
+                        }
+                        for (int k = 0; k < Winners.size(); k++) {
+                            WinnersString = WinnersString + Winners.get(k).getAsMention() + ", ";
+                        }
+                        WinnersString = WinnersString.substring(0, WinnersString.length() - 2);
+                    }
+
+                    EmbedBuilder EndGiveaway = new EmbedBuilder()
+                            .setTitle(":tada: GIVEAWAY ENDED :tada:")
+                            .setThumbnail(CurrentBotLogo)
+                            .setColor(Color)
+                            .addField(":gift: Prize:", "`" + CurrentReward + "`", false)
+                            .addField(":trophy: Winner(s):", WinnersString, false)
+                            .addField(":information_source: Total Entries: ", "`" + MembersReacted.size() + "`", false)
+                            .addField(":alarm_clock: Giveaway Length: ", "`" + CurrentGiveawayEndTimeFormat + "`", false)
+                            .addField(":bust_in_silhouette: Hosted by ", Bot.jda.getGuildById(CurrentGuildID).getMemberById(CurrentHostID).getAsMention(), false)
+                            .setTimestamp(FinalDate)
+                            .setFooter("Ended at ", CurrentBotLogo);
+                    Bot.jda.getGuildById(CurrentGuildID).getTextChannelById(CurrentChannelID).editMessageById(CurrentMessageID, EndGiveaway.build()).queue();
+                    Bot.jda.getGuildById(CurrentGuildID).getTextChannelById(CurrentChannelID).clearReactionsById(CurrentMessageID).queue();
+
+                    EmbedBuilder EmbedWinners = new EmbedBuilder()
+                            .setTitle(":trophy: GIVEAWAY WINNERS :trophy")
+                            .setThumbnail(CurrentBotLogo)
+                            .setColor(Color)
+                            .setTimestamp(FinalDate)
+                            .setDescription("[Click to view original giveaway](https://discordapp.com/channels/" + CurrentGuildID + "/" + CurrentChannelID + "/" + CurrentMessageID + ")")
+                            .addField(":trophy: Winner(s):", WinnersString, false)
+                            .setFooter("Ended at ", CurrentBotLogo);
+                    Bot.jda.getGuildById(CurrentGuildID).getTextChannelById(CurrentChannelID).sendMessage(EmbedWinners.build()).queue();
+
+
+                    ArrayOfGiveaways.get(i).put("GiveawayEnded", true);
+                    ArrayList<String> TotalReactedMemberIDS = new ArrayList<>();
+                    for (int a = 0; a < MembersReacted.size(); a++) {
+                        TotalReactedMemberIDS.add(MembersReacted.get(a).getId());
+                    }
+                    ArrayOfGiveaways.get(i).put("TotalReactedMemberIDS", TotalReactedMemberIDS);
+
+                    ArrayList<String> ArrayOfWinnersID = new ArrayList<>();
+                    for (int k = 0; k < Winners.size(); k++) {
+                        ArrayOfWinnersID.add(Winners.get(k).getId());
+                    }
+
+                    ArrayOfGiveaways.get(i).put("WinnersID", ArrayOfWinnersID);
+
+
+                    JSONObject all = new JSONObject();
+                    all.put("Giveaways", ArrayOfGiveaways);
+
+                    try {
+                        Files.write(Paths.get("Giveaways.json"), all.toJSONString().getBytes());
+                    } catch (Exception ef) {
+                        ef.printStackTrace();
+                    }
+
+
+                }
+
+            }
+
+
+        }
+    };
 
 
 }

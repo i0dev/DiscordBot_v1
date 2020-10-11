@@ -1,11 +1,6 @@
-import com.sun.media.sound.EmergencySoundbank;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.EmbedType;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -89,7 +84,8 @@ public class TEST_Help extends ListenerAdapter {
                             ":two: » **Moderation Commands**\n" +
                             ":three: » **Ticket Commands**\n" +
                             ":four: » **Application Commands**\n" +
-                            ":five: » **Fun Commands**\n");
+                            ":five: » **Fun Commands**\n" +
+                            ":six: » **Giveaway Commands**\n");
 
 
             EmbedRules.setColor(Color);
@@ -102,6 +98,8 @@ public class TEST_Help extends ListenerAdapter {
                 message1.addReaction("3️⃣").queue();
                 message1.addReaction("4️⃣").queue();
                 message1.addReaction("5️⃣").queue();
+                message1.addReaction("6️⃣").queue();
+
                 HelpMessageID = message1.getId();
             });
             Timer myTimer = new Timer();
@@ -112,16 +110,33 @@ public class TEST_Help extends ListenerAdapter {
                         SecondsPassed = 0;
                         e.getChannel().clearReactionsById(HelpMessageID).queue();
                         myTimer.cancel();
+                        EmbedBuilder embed = new EmbedBuilder();
+                        embed.setTitle(BotName + "Help Page")
+                                .setDescription("The help page has timed out! please re-type `" + BotPrefix + "help` to see the commands again!")
+                                .setFooter(WaterMark, BotLogo)
+                                .setTimestamp(LocalTime)
+                                .setColor(Color);
+                        e.getChannel().editMessageById(HelpMessageID, embed.build()).queue(message1 -> {
+                            message1.delete().queueAfter(10, TimeUnit.SECONDS);
+                        });
                         HelpMessageID = "";
-                        e.getChannel().deleteMessageById(HelpMessageID);
 
                     }
                     while (SecondsPassed >= 900000000) {
                         SecondsPassed = 0;
                         myTimer.cancel();
                         e.getChannel().clearReactionsById(HelpMessageID).queue();
-                        HelpMessageID = "";
                         e.getChannel().deleteMessageById(HelpMessageID);
+                        EmbedBuilder embed = new EmbedBuilder();
+                        embed.setTitle(BotName + "Help Page")
+                                .setDescription("The help page timer has expired! please re-type `" + BotPrefix + "help` to see the commands again!")
+                                .setFooter(WaterMark, BotLogo)
+                                .setTimestamp(LocalTime);
+                        e.getChannel().editMessageById(HelpMessageID, embed.build()).queue(message1 -> {
+                            message1.delete().queueAfter(10, TimeUnit.SECONDS);
+                        });
+                        HelpMessageID = "";
+
 
                     }
                 }
@@ -190,7 +205,6 @@ public class TEST_Help extends ListenerAdapter {
                                     "**" + Bot.BotPrefix + "ss add [Ign] [reason]** > Adds that IGN to the SS List\n" +
                                     "**" + Bot.BotPrefix + "ss remove [Ign]** > Removes that IGN to the SS List\n" +
                                     "**" + Bot.BotPrefix + "ss list** > Shows the current SS List\n"
-
                             , false)
                     .setTimestamp(LocalTime)
                     .setFooter(BotName, BotLogo);
@@ -222,7 +236,8 @@ public class TEST_Help extends ListenerAdapter {
                                     "**" + BotPrefix + "Confirm [@Leader] [Faction Name] [Roster Size]** **→** Confirms that faction as playing\n" +
                                     "**" + BotPrefix + "Poll [Number Of Options]** **→** Starts the Poll-Creator in DMS\n" +
                                     "**" + BotPrefix + "Clear** **→** Clears nearly all messages in a channel\n" +
-                                    "**" + BotPrefix + "TicketTop** **→** Get's the top closed tickets!\n"
+                                    "**" + BotPrefix + "TicketTop** **→** Get's the top closed tickets!\n" +
+                                    "**" + BotPrefix + "reload** > Reloads all the config\n"
 
 
                             , false)
@@ -301,6 +316,28 @@ public class TEST_Help extends ListenerAdapter {
                 message69.addReaction("⬅️").queue();
             });
         }
+        if (e.getReactionEmote().getName().equals("6️⃣") && e.getMessageId().equals(HelpMessageID) && !e.getUser().isBot()) {
+
+            EmbedBuilder Embed = new EmbedBuilder()
+                    .setColor(Color)
+                    .setTitle("Giveaway Commands Help Page")
+                    .setDescription("React with :arrow_left: to return to the main help menu")
+                    .addField("",
+                            "**" + BotPrefix + "gStart** **→** Starts the giveaway-creator.\n" +
+                                    "**" + BotPrefix + "gList** **→** Sends the list of current giveaways!\n" +
+                                    "**" + BotPrefix + "gReRoll [Message ID] ** **→** Re-Rolls that giveaways winners!\n" +
+                                    "**" + BotPrefix + "gDelete [Message ID] ** **→** Deletes and cancels that giveaway!\n" +
+                                    "**" + BotPrefix + "gEnd [Message ID] ** **→** Ends that giveaway now!\n" +
+                                    "**" + BotPrefix + "CancelGiveaways** **→** Cancels all active giveaway-creators.\n"
+                            , false)
+                    .setTimestamp(LocalTime)
+                    .setFooter(BotName, BotLogo);
+            e.getChannel().clearReactionsById(HelpMessageID).queue();
+            SecondsPassed = 0;
+            e.getChannel().editMessageById(HelpMessageID, Embed.build()).queue(message69 -> {
+                message69.addReaction("⬅️").queue();
+            });
+        }
         if (e.getReactionEmote().getName().equals("⬅️") && e.getMessageId().equals(HelpMessageID) && !e.getUser().isBot()) {
 
             EmbedBuilder EmbedRules = new EmbedBuilder();
@@ -313,7 +350,8 @@ public class TEST_Help extends ListenerAdapter {
                             ":two: » **Moderation Commands**\n" +
                             ":three: » **Ticket Commands**\n" +
                             ":four: » **Application Commands**\n" +
-                            ":five: » **Fun Commands**\n");
+                            ":five: » **Fun Commands**\n" +
+                            ":six: » **Giveaway Commands**\n");
 
             EmbedRules.setTimestamp(LocalTime);
             EmbedRules.setFooter(BotName, BotLogo);
@@ -325,6 +363,7 @@ public class TEST_Help extends ListenerAdapter {
                 message1.addReaction("3️⃣").queue();
                 message1.addReaction("4️⃣").queue();
                 message1.addReaction("5️⃣").queue();
+                message1.addReaction("6️⃣").queue();
 
             });
 

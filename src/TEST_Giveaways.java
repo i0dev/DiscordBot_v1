@@ -12,15 +12,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.time.temporal.TemporalAccessor;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
-public class TEST_Polls extends ListenerAdapter {
+public class TEST_Giveaways extends ListenerAdapter {
     public String BotPrefix = Bot.BotPrefix;
     public String BotName = Bot.BotName;
     public ZonedDateTime LocalTime = Bot.LocalTime;
@@ -62,7 +62,7 @@ public class TEST_Polls extends ListenerAdapter {
         Color Color = java.awt.Color.decode(Bot.ColorHexCode);
         MessageChannel channel = e.getChannel();
         String[] message = e.getMessage().getContentRaw().split(" ");
-        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "polls")) {
+        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "gstart")) {
             ArrayList<String> BlacklistedGet = new ArrayList<>();
             if (new File("BlacklistedUsers.json").exists()) {
                 try {
@@ -94,13 +94,13 @@ public class TEST_Polls extends ListenerAdapter {
                 isAllowed = true;
             }
         }
-        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "CancelPolls") && !e.getAuthor().isBot()) {
+        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "CancelGiveaways") && !e.getAuthor().isBot()) {
             if (isAllowed) {
                 if (CurrentQuestion == -1) {
                     EmbedBuilder EmbedRules = new EmbedBuilder();
-                    EmbedRules.setTitle("Poll-Creator");
+                    EmbedRules.setTitle("Giveaway-Creator");
                     EmbedRules.setColor(Color);
-                    EmbedRules.addField("Error:", e.getAuthor().getAsTag() + ", There is currently no one creating a poll.", false);
+                    EmbedRules.addField("Error:", e.getAuthor().getAsTag() + ", There is currently no one creating a giveaway.", false);
                     EmbedRules.setTimestamp(Bot.now);
                     EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
                     channel.sendMessage(EmbedRules.build()).queue(message1 -> {
@@ -108,9 +108,9 @@ public class TEST_Polls extends ListenerAdapter {
                     });
                 } else {
                     EmbedBuilder EmbedRules = new EmbedBuilder();
-                    EmbedRules.setTitle("Poll-Creator");
+                    EmbedRules.setTitle("Giveaway-Creator");
                     EmbedRules.setColor(Color);
-                    EmbedRules.addField("Success:", e.getAuthor().getAsTag() + ", You have canceled all current polls", false);
+                    EmbedRules.addField("Success:", e.getAuthor().getAsTag() + ", You have canceled all current giveaways", false);
                     EmbedRules.setTimestamp(Bot.now);
                     EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
                     channel.sendMessage(EmbedRules.build()).queue(message1 -> {
@@ -132,43 +132,7 @@ public class TEST_Polls extends ListenerAdapter {
             }
         }
 
-        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "poll") && !e.getAuthor().isBot()) {
-            if (CurrentQuestion == -1 || CurrentQuestion == 0) {
-                if (isAllowed) {
-                    EmbedBuilder EmbedRules = new EmbedBuilder();
-                    EmbedRules.setTitle("Incorrect Format");
-                    EmbedRules.setColor(Color);
-                    EmbedRules.addField("Format:", "" + Bot.BotPrefix + "poll [Number Of Options]", false);
-                    EmbedRules.setTimestamp(LocalTime);
-                    EmbedRules.setFooter(Bot.WaterMark, BotLogo);
-                    channel.sendMessage(EmbedRules.build()).queue(message1 -> {
-                        e.getMessage().delete().queue();
-                    });
-                } else {
-                    EmbedBuilder EmbedRules = new EmbedBuilder();
-                    EmbedRules.setTitle("Insufficient Permissions");
-                    EmbedRules.setColor(Color);
-                    EmbedRules.addField("Error:", "You do not have permission to run this command!", false);
-                    EmbedRules.setTimestamp(LocalTime);
-                    EmbedRules.setFooter(Bot.WaterMark, BotLogo);
-                    channel.sendMessage(EmbedRules.build()).queue(message1 -> {
-                        e.getMessage().delete().queue();
-                    });
-                }
-
-            } else {
-                final EmbedBuilder EmbedRules = new EmbedBuilder();
-                this.userID = e.getAuthor().getId();
-                EmbedRules.setTitle("On-Going Poll-Creator");
-                EmbedRules.setDescription("**Hey " + e.getMember().getUser().getAsTag() + ", Someone is already creating a poll, Their poll" +
-                        " will expire in `" + (300 - SecondsPassed) + "` seconds, if they do not answer a question within that time.** \nYou can use .cancelPolls if you wish to stop all polls being created");
-                EmbedRules.setColor(Color);
-                EmbedRules.setTimestamp(Bot.now);
-                EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
-                channel.sendMessage(EmbedRules.build()).queue(message1 -> e.getMessage().delete().queueAfter(3L, TimeUnit.SECONDS));
-            }
-        }
-        if (message.length == 2 && message[0].equalsIgnoreCase(Bot.BotPrefix + "poll") && !e.getAuthor().isBot()) {
+        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "gstart") && !e.getAuthor().isBot()) {
             if (!isAllowed) {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
                 EmbedRules.setTitle("Insufficient Permissions");
@@ -182,63 +146,33 @@ public class TEST_Polls extends ListenerAdapter {
             } else {
                 if (CurrentQuestion == -1 || CurrentQuestion == 0) {
                     this.applicant = e.getMember().getUser();
-                    this.applicantMember = e.getMember();
-                    final EmbedBuilder EmbedRules = new EmbedBuilder();
-                    this.userID = e.getAuthor().getId();
-                    EmbedRules.setTitle("Poll-Creator");
-                    EmbedRules.setDescription("Hey **" + e.getMember().getUser().getAsTag() + "**, Please look at your Direct messages to fill out the poll!");
+                    applicantMember = e.getMember();
+                    EmbedBuilder EmbedRules = new EmbedBuilder();
+                    userID = e.getAuthor().getId();
+                    EmbedRules.setTitle("Giveaway-Creator");
+                    EmbedRules.setDescription("Hey **" + e.getMember().getUser().getAsTag() + "**, Please look at your Direct messages to fill out the giveaway!");
                     EmbedRules.setColor(Color);
                     EmbedRules.setTimestamp(Bot.now);
                     EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
                     channel.sendMessage(EmbedRules.build()).queue(message1 -> e.getMessage().delete().queueAfter(3, TimeUnit.SECONDS));
-                    this.DMS = e.getMember().getUser().openPrivateChannel().complete();
+                    DMS = e.getMember().getUser().openPrivateChannel().complete();
                     final EmbedBuilder DMSHeader = new EmbedBuilder();
-                    DMSHeader.setDescription("**Poll Wizard Started!** \n\n Type **.cancel** at any time to stop the poll creator");
+                    DMSHeader.setDescription("**Giveaway Wizard Started!** \n\n Type **.cancel** at any time to stop the giveaway creator");
                     DMSHeader.setColor(java.awt.Color.GREEN);
                     DMSHeader.setFooter(Bot.WaterMark, Bot.Logo);
-                    this.DMS.sendMessage(DMSHeader.build()).queue();
+                    DMS.sendMessage(DMSHeader.build()).queue();
                     userID = e.getAuthor().getId();
-                    Questions.add("Please mention the channel you wish to create the poll in. `<#ChannelID>`");
-                    Questions.add("What is the poll about or the general description?");
-                    for (int i = 1; i < (Integer.parseInt(message[1])) + 1; i++) {
-                        String FormattedI = "Extra, Beyond set formatting";
-                        switch (i) {
-                            case 1:
-                                FormattedI = "First";
-                                break;
-                            case 2:
-                                FormattedI = "Second";
-                                break;
-                            case 3:
-                                FormattedI = "Third";
-                                break;
-                            case 4:
-                                FormattedI = "Fourth";
-                                break;
-                            case 5:
-                                FormattedI = "Fifth";
-                                break;
-                            case 6:
-                                FormattedI = "Sixth";
-                                break;
-                            case 7:
-                                FormattedI = "Seventh";
-                                break;
-                            case 8:
-                                FormattedI = "Eighth";
-                                break;
-                        }
-                        Questions.add("What is the `" + FormattedI + "` option in the poll");
-                        Questions.add("Enter the emoji you want to use for the `" + FormattedI + "` poll");
-                    }
-                    Questions.add("Type **Submit** to complete your poll");
-
-                    final EmbedBuilder Question1 = new EmbedBuilder();
+                    Questions.add("Please mention the channel you wish to create the giveaway in. `<#ChannelID>`:");
+                    Questions.add("Please enter the giveaway reward(s):");
+                    Questions.add("Please enter the giveaway time:");
+                    Questions.add("Please enter how many winners there will be:");
+                    Questions.add("Type **Submit** to complete your giveaway");
+                    EmbedBuilder Question1 = new EmbedBuilder();
                     Question1.setTitle("Question " + 1 + "/" + (Questions.size() - 1));
                     Question1.setDescription(Questions.get(0));
                     Question1.setColor(Color);
                     Question1.setFooter(Bot.WaterMark, Bot.Logo);
-                    applicant = e.getAuthor();
+                    this.applicant = e.getAuthor();
                     DMS.sendMessage(Question1.build()).queue();
                     CurrentQuestion = 1;
                     responses.clear();
@@ -252,8 +186,8 @@ public class TEST_Polls extends ListenerAdapter {
                                 SecondsPassed = 0;
                                 CurrentQuestion = -1;
                                 EmbedBuilder ember = new EmbedBuilder()
-                                        .setTitle("Poll-Creator")
-                                        .setDescription("Your current poll-creation has timed out!, after `" + 300 + "` seconds of inactivity.")
+                                        .setTitle("Giveaway-Creator")
+                                        .setDescription("Your current giveaway-creation has timed out!, after `" + 300 + "` seconds of inactivity.")
                                         .setFooter(Bot.WaterMark, Bot.Logo)
                                         .setColor(Color);
                                 Bot.jda.getUserById(applicant.getId()).openPrivateChannel().complete().sendMessage(ember.build()).queue();
@@ -286,9 +220,9 @@ public class TEST_Polls extends ListenerAdapter {
                 } else {
                     final EmbedBuilder EmbedRules = new EmbedBuilder();
                     this.userID = e.getAuthor().getId();
-                    EmbedRules.setTitle("On-Going Poll-Creator");
-                    EmbedRules.setDescription("**Hey " + e.getMember().getUser().getAsTag() + ", Someone is already creating a poll, Their poll" +
-                            " will expire in `" + (300 - SecondsPassed) + "` seconds, if they do not answer a question within that time.** \nYou can use .cancelPolls if you wish to stop all polls being created");
+                    EmbedRules.setTitle("On-Going Giveaway-Creator");
+                    EmbedRules.setDescription("**Hey " + e.getMember().getUser().getAsTag() + ", Someone is already creating a giveaway, Their giveaway" +
+                            " will expire in `" + (300 - SecondsPassed) + "` seconds, if they do not answer a question within that time.** \nYou can use .cancelGiveaways if you wish to stop all polls being created");
                     EmbedRules.setColor(Color);
                     EmbedRules.setTimestamp(Bot.now);
                     EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
@@ -300,18 +234,18 @@ public class TEST_Polls extends ListenerAdapter {
 
     @Override
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent e) {
-        final Color Color = java.awt.Color.decode(Bot.ColorHexCode);
+        Color Color = java.awt.Color.decode(Bot.ColorHexCode);
         if (e.getMessage().getContentRaw().equalsIgnoreCase(Bot.BotPrefix + "cancel") && !e.getAuthor().isBot() && e.getChannel().getUser().equals(this.applicant) && this.CurrentQuestion != -1) {
-            final EmbedBuilder EmbedRules = new EmbedBuilder();
-            this.userID = e.getAuthor().getId();
+            EmbedBuilder EmbedRules = new EmbedBuilder();
+            userID = e.getAuthor().getId();
             EmbedRules.setTitle("Poll-Creator");
-            EmbedRules.setDescription("**You canceled your current Poll-Creator Session**");
+            EmbedRules.setDescription("**You canceled your current Giveaway-Creator Session**");
             EmbedRules.setColor(Color);
             EmbedRules.setTimestamp(Bot.now);
             EmbedRules.setFooter(Bot.WaterMark);
             e.getChannel().sendMessage(EmbedRules.build()).queue();
-            this.CurrentQuestion = -1;
-            this.responses.clear();
+            CurrentQuestion = -1;
+            responses.clear();
             SecondsPassed = 0;
             responses.clear();
             applicant = null;
@@ -341,67 +275,90 @@ public class TEST_Polls extends ListenerAdapter {
                         if (e.getMessage().getMentionedChannels().size() > 0 && CurrentQuestion == 2) {
                             PollChannel = e.getMessage().getMentionedChannels().get(0);
                         }
-                        if (e.getMessage().getEmotes().size() > 0) {
-                            EmojiORDER.add(e.getMessage().getEmotes().get(0));
-                        }
                     }
                 } else if (CurrentQuestion == Questions.size() && CurrentQuestion != -1) {
                     SecondsPassed = 900000000;
 
                     EmbedBuilder QuestionFinished = new EmbedBuilder();
-                    QuestionFinished.setDescription("**Poll Created!** in the " + responses.get(0) + " Channel!!");
+                    QuestionFinished.setDescription("**Giveaway Created!** in the " + responses.get(0) + " Channel!!");
                     QuestionFinished.setColor(Color);
                     e.getChannel().sendMessage(QuestionFinished.build()).queue();
                     responses.add(e.getMessage().getContentRaw());
 
-                    EmbedBuilder Embed = new EmbedBuilder();
-                    String Description = "";
-                    Description = Description + responses.get(1);
-                    Description = Description + "";
-                    Description = Description + "\n\n";
 
-                    for (int i = 2; i < responses.size(); i = i + 2) {
-                        OptionInOrder.add(responses.get(i));
-                    }
-                    for (int i = 3; i < responses.size(); i = i + 2) {
-                        EmojiInOrder.add(responses.get(i));
-                    }
-                    for (int d = 0; d < EmojiInOrder.size(); d++) {
-                        Description = Description + EmojiInOrder.get(d) + " » **" + OptionInOrder.get(d) + "**";
-                        Description = Description + "\n";
-                    }
-                    Description = Description + "\n";
+                    String ChannelFormatted = responses.get(0);
+                    String Rewards = responses.get(1);
+                    String TimeLong = responses.get(2);
+                    String WinnersAmount = responses.get(3);
 
+                    int TimeSeconds = getTime(TimeLong);
+                    long CurrentTimeMilis = System.currentTimeMillis();
+                    long EndTimeMilis = CurrentTimeMilis + (TimeSeconds * 1000);
+                    Instant EndInstant = Instant.ofEpochMilli(EndTimeMilis);
+                    ZonedDateTime FinalDate = ZonedDateTime.ofInstant(EndInstant, ZoneId.systemDefault());
 
-                    Embed.setTitle("Incoming Poll!")
-                            .setColor(Color)
+                    EmbedBuilder Embed = new EmbedBuilder()
+                            .setTitle(":tada: NEW GIVEAWAY :tada:")
                             .setThumbnail(BotLogo)
-                            .setTimestamp(LocalTime)
-                            .setFooter(Bot.WaterMark, BotLogo)
-                            .setDescription(Description);
+                            .setColor(Color)
+                            .setDescription("**React with " + "🎉" + " To enter!**")
+                            .addField(":gift: Prize:", "`" + Rewards + "`", false)
+                            .addField(":alarm_clock: Giveaway Length: ", "`" + TimeLong + "`", false)
+                            .addField(":bust_in_silhouette: Hosted by ", applicant.getAsMention(), false)
+                            .setTimestamp(FinalDate)
+                            .setFooter("Ends at ", BotLogo);
                     Message Poll = null;
-                    Message Pol2 = e.getChannel().sendMessage(Embed.build()).complete();
+                    Message PollTitle = null;
                     try {
                         Poll = e.getJDA().getGuildById(PollChannel.getGuild().getId()).getTextChannelById(PollChannel.getId()).sendMessage(Embed.build()).complete();
                     } catch (Exception fe) {
                         fe.printStackTrace();
                     }
+                    Poll.addReaction("🎉").queue();
 
-                    for (int i = 0; i < EmojiInOrder.size(); i++) {
-                        String Emoji = EmojiInOrder.get(i);
-                        if (Emoji.contains("<") && Emoji.contains(">")) {
-                            Emoji = Emoji.substring(0, (Emoji.length() - 1));
-                        } else {
-                            if (Emoji.contains(":")) {
-                                Emoji = Emoji.substring(1, Emoji.length() - 1);
 
-                            } else {
-                                Emoji = EmojiInOrder.get(i);
-                            }
-                        }
-                        Pol2.addReaction(Emoji).queue();
-                        Poll.addReaction(Emoji).queue();
+                    ArrayList<JSONObject> ArrayOfGiveaways = new ArrayList<>();
+                    try {
+                        JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Giveaways.json")));
+                        ArrayOfGiveaways = (ArrayList<JSONObject>) json.get("Giveaways");
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
                     }
+
+                    JSONObject CurrentGiveawayObject = new JSONObject();
+
+                    CurrentGiveawayObject.put("ChannelID", PollChannel.getId());
+                    CurrentGiveawayObject.put("GuildID", PollChannel.getGuild().getId());
+                    CurrentGiveawayObject.put("WinnersAmount", WinnersAmount);
+                    CurrentGiveawayObject.put("MessageID", Poll.getId());
+                    CurrentGiveawayObject.put("EndTimeMillis", EndTimeMilis);
+                    CurrentGiveawayObject.put("EndTimeFormat", TimeLong);
+                    try {
+                        CurrentGiveawayObject.put("HostID", applicant.getId());
+                    } catch (Exception error) {
+                        CurrentGiveawayObject.put("HostID", Bot.jda.getSelfUser().getId());
+
+                    }
+                    ArrayList<JSONObject> EmptyArray = new ArrayList<>();
+                    CurrentGiveawayObject.put("TotalReactedMemberIDS", EmptyArray);
+                    CurrentGiveawayObject.put("WinnersID", EmptyArray);
+
+                    CurrentGiveawayObject.put("GiveawayEnded", false);
+                    CurrentGiveawayObject.put("Reward", Rewards);
+                    CurrentGiveawayObject.put("BotLogo", BotLogo);
+                    CurrentGiveawayObject.put("CurrentColorHexCode", ColorHexCode);
+                    ArrayOfGiveaways.add(CurrentGiveawayObject);
+
+                    JSONObject all = new JSONObject();
+                    all.put("Giveaways", ArrayOfGiveaways);
+
+                    try {
+                        Files.write(Paths.get("Giveaways.json"), all.toJSONString().getBytes());
+                    } catch (Exception ef) {
+                        ef.printStackTrace();
+                    }
+
+
                     applicant = null;
                     responses.clear();
                     CurrentQuestion = -1;
@@ -412,6 +369,47 @@ public class TEST_Polls extends ListenerAdapter {
                 }
 
             }
+        }
+    }
+
+    public static int getTime(String input) {
+        input = input.toLowerCase();
+        if (input.isEmpty()) return -1;
+        int time = 0;
+        StringBuilder number = new StringBuilder();
+        for (char c : input.toCharArray()) {
+            if (isInt(String.valueOf(c))) {
+                number.append(c);
+                continue;
+            }
+            if (number.toString().isEmpty()) return -1;
+            int add = Integer.parseInt(number.toString());
+            switch (c) {
+                case 'w':
+                    add *= 7;
+                case 'd':
+                    add *= 24;
+                case 'h':
+                    add *= 60;
+                case 'm':
+                    add *= 60;
+                case 's':
+                    time += add;
+                    number.setLength(0);
+                    break;
+                default:
+                    return -1;
+            }
+        }
+        return time;
+    }
+
+    public static boolean isInt(String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 }

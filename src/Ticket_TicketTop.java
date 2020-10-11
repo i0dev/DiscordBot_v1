@@ -96,32 +96,54 @@ public class Ticket_TicketTop extends ListenerAdapter {
 
         if (e.getMessage().getContentRaw().equalsIgnoreCase(BotPrefix + "TicketTop")) {
             Color Color = java.awt.Color.decode(ColorHexCode);
-
-
-            ArrayList<ArrayList<Long>> IDMatcher = new ArrayList<>();
-
-            if (new File("Warnings.json").exists()) {
-                try {
-                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/TicketTop.json")));
-                    IDMatcher = (ArrayList<ArrayList<Long>>) json.get("TicketTop");
-                } catch (Exception ee) {
-                    ee.printStackTrace();
+            boolean isAllowed = false;
+            for (int i = 0; i < Bot.AllowedRoles.size(); i++) {
+                if (e.getMember().getRoles().contains(e.getGuild().getRoleById(Bot.AllowedRoles.get(i))) || e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
+                    isAllowed = true;
                 }
-                IDMatcher = (ArrayList<ArrayList<Long>>) IDMatcher.stream().sorted((list1, list2) -> list2.get(1).compareTo(list1.get(1))).collect(Collectors.toList());
+            }
+            for (int i = 0; i < Bot.LightAllowedRoleIDS.size(); i++) {
+                if (e.getMember().getRoles().contains(e.getGuild().getRoleById(Bot.LightAllowedRoleIDS.get(i))) || e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
+                    isAllowed = true;
+                }
+            }
+            if (!isAllowed) {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
-                for (int i = 0; i < IDMatcher.size(); i++) {
-                    EmbedRules.addField("#" + (i + 1) + "", "**" + e.getGuild().getMemberById(IDMatcher.get(i).get(0)).getUser().getAsTag() + "** - `" + IDMatcher.get(i).get(1) + "`", false);
-
-                }
-                EmbedRules.setTitle("Top Tickets Closed!")
-                        .setDescription("Every time you close a ticket, you will get a \"point\" and the leaderboard of top ticket closed staff members are here!");
+                EmbedRules.setTitle("Insufficient Permissions");
                 EmbedRules.setColor(Color);
-                EmbedRules.setTimestamp(LocalTime);
-                EmbedRules.setFooter(Bot.WaterMark, BotLogo);
+                EmbedRules.addField("Error:", "You do not have permission to run this command!", false);
+                EmbedRules.setTimestamp(Bot.now);
+                EmbedRules.setFooter(Bot.WaterMark, Bot.Logo);
                 e.getChannel().sendMessage(EmbedRules.build()).queue(message1 -> {
                     e.getMessage().delete().queue();
                 });
-                IDMatcher.clear();
+            } else {
+
+                ArrayList<ArrayList<Long>> IDMatcher = new ArrayList<>();
+
+                if (new File("Tickets/TicketTop.json").exists()) {
+                    try {
+                        JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/TicketTop.json")));
+                        IDMatcher = (ArrayList<ArrayList<Long>>) json.get("TicketTop");
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                    IDMatcher = (ArrayList<ArrayList<Long>>) IDMatcher.stream().sorted((list1, list2) -> list2.get(1).compareTo(list1.get(1))).collect(Collectors.toList());
+                    EmbedBuilder EmbedRules = new EmbedBuilder();
+                    for (int i = 0; i < IDMatcher.size(); i++) {
+                        EmbedRules.addField("#" + (i + 1) + "", "**" + e.getGuild().getMemberById(IDMatcher.get(i).get(0)).getUser().getAsTag() + "** - `" + IDMatcher.get(i).get(1) + "`", false);
+
+                    }
+                    EmbedRules.setTitle("Top Tickets Closed!")
+                            .setDescription("Every time you close a ticket, you will get a \"point\" and the leaderboard of top ticket closed staff members are here!");
+                    EmbedRules.setColor(Color);
+                    EmbedRules.setTimestamp(LocalTime);
+                    EmbedRules.setFooter(Bot.WaterMark, BotLogo);
+                    e.getChannel().sendMessage(EmbedRules.build()).queue(message1 -> {
+                        e.getMessage().delete().queue();
+                    });
+                    IDMatcher.clear();
+                }
             }
         }
     }

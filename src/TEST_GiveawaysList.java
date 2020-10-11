@@ -12,10 +12,11 @@ import java.io.FileReader;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
-public class Extra_StaffClear extends ListenerAdapter {
+public class TEST_GiveawaysList extends ListenerAdapter {
     public String BotPrefix = Bot.BotPrefix;
     public String BotName = Bot.BotName;
     public ZonedDateTime LocalTime = ZonedDateTime.now();
@@ -61,7 +62,7 @@ public class Extra_StaffClear extends ListenerAdapter {
         Color Color = java.awt.Color.decode(ColorHexCode);
         MessageChannel channel = e.getChannel();
         String[] message = e.getMessage().getContentRaw().split(" ");
-        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "staffclear")) {
+        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "glist")) {
             ArrayList<String> BlacklistedGet = new ArrayList<>();
             if (new File("BlacklistedUsers.json").exists()) {
                 try {
@@ -87,98 +88,59 @@ public class Extra_StaffClear extends ListenerAdapter {
                 return;
             }
         }
+
         boolean isAllowed = false;
         for (int i = 0; i < Bot.AllowedRoles.size(); i++) {
             if (e.getMember().getRoles().contains(e.getGuild().getRoleById(Bot.AllowedRoles.get(i))) || e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
                 isAllowed = true;
             }
         }
-        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "StaffClear")) {
+
+        if ((message.length == 1) && message[0].equalsIgnoreCase(Bot.BotPrefix + "glist")) {
             if (isAllowed) {
-                EmbedBuilder EmbedRules = new EmbedBuilder();
-                EmbedRules.setTitle("Incorrect Format");
-                EmbedRules.setColor(Color);
-                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "StaffClear [@User] <-s>", false);
-                EmbedRules.setTimestamp(now);
-                EmbedRules.setFooter(Bot.WaterMark, BotLogo);
-                channel.sendMessage(EmbedRules.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
-                });
-            } else {
-                EmbedBuilder EmbedRules = new EmbedBuilder();
-                EmbedRules.setTitle("Insufficient Permissions");
-                EmbedRules.setColor(Color);
-                EmbedRules.addField("Error:", "You do not have permission to run this command!", false);
-                EmbedRules.setTimestamp(now);
-                EmbedRules.setFooter(Bot.WaterMark, BotLogo);
-                channel.sendMessage(EmbedRules.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
-                });
-            }
-        }
 
-        if ((message.length == 2 || message.length == 3) && message[0].equalsIgnoreCase(Bot.BotPrefix + "StaffClear")) {
-            if (isAllowed) {
-                if (e.getMessage().getContentRaw().contains(" -s")) {
-
-
-                    User MentionedUser = e.getMessage().getMentionedUsers().get(0);
-                    Member MentionedMember = e.getMessage().getMentionedMembers().get(0);
-
-
-                    for (int i = 0; i < StaffRoleIDS.size(); i++) {
-
-                        if (MentionedMember.getRoles().contains(e.getGuild().getRoleById(StaffRoleIDS.get(i)))) {
-                            e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i))).queue();
-                        }
-                    }
-                    e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
-
-
-                    EmbedBuilder EmbedFirst = new EmbedBuilder()
-                            .setTitle("Successfully Removed " + MentionedUser.getAsTag())
-                            .setColor(Color)
-                            .addField("Success", e.getMember().getUser().getAsTag() + ", you have  __*Silently*__ Removed " + MentionedMember.getUser().getAsTag(), false)
-                            .setTimestamp(now)
-                            .setFooter(Bot.WaterMark, BotLogo);
-                    channel.sendMessage(EmbedFirst.build()).queue(message1 -> {
-                        e.getMessage().delete().queue();
-                    });
-
-                } else {
-
-                    User MentionedUser = e.getMessage().getMentionedUsers().get(0);
-                    Member MentionedMember = e.getMessage().getMentionedMembers().get(0);
-
-
-                    for (int i = 0; i < StaffRoleIDS.size(); i++) {
-
-                        if (MentionedMember.getRoles().contains(e.getGuild().getRoleById(StaffRoleIDS.get(i)))) {
-                            e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i))).queue();
-                        }
-                    }
-                    e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
-
-
-                    EmbedBuilder EmbedFirst = new EmbedBuilder()
-                            .setTitle("Successfully Removed " + MentionedUser.getAsTag())
-                            .setColor(Color)
-                            .addField("Success", e.getMember().getUser().getAsTag() + ", you have Removed " + MentionedMember.getUser().getAsTag(), false)
-                            .setTimestamp(now)
-                            .setFooter(Bot.WaterMark, BotLogo);
-                    channel.sendMessage(EmbedFirst.build()).queue();
-
-                    EmbedBuilder Embed = new EmbedBuilder()
-                            .setTitle("Staff Movement")
-                            .setColor(Color)
-                            .addField("Remove", "**" + MentionedMember.getUser().getAsTag() + "**" + " has been Removed by " + "**" + e.getAuthor().getAsTag() + "**", false)
-                            .setTimestamp(now)
-                            .setFooter(Bot.WaterMark, BotLogo);
-                    e.getGuild().getTextChannelById(StaffMovementsChannelID).sendMessage(Embed.build()).queue(message1 -> {
-                        e.getMessage().delete().queue();
-                    });
+                ArrayList<JSONObject> ArrayOfGiveaways = new ArrayList<>();
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Giveaways.json")));
+                    ArrayOfGiveaways = (ArrayList<JSONObject>) json.get("Giveaways");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
                 }
+                JSONObject CurrentGiveaway = new JSONObject();
 
+                EmbedBuilder EmbedList = new EmbedBuilder()
+                        .setTitle(BotName + " Giveaways")
+                        .setTimestamp(LocalTime)
+                        .setThumbnail(BotLogo)
+                        .setColor(Color)
+                        .setFooter(Bot.WaterMark, BotLogo);
+
+                ArrayList<String> ArrayOfActiveGiveaways = new ArrayList<>();
+
+                for (int i = 0; i < ArrayOfGiveaways.size(); i++) {
+                    if (!(boolean) ArrayOfGiveaways.get(i).get("GiveawayEnded")) {
+
+                        String CurrentGuildID = ArrayOfGiveaways.get(i).get("GuildID").toString();
+                        String CurrentChannelID = ArrayOfGiveaways.get(i).get("ChannelID").toString();
+                        String CurrentMessageID = ArrayOfGiveaways.get(i).get("MessageID").toString();
+                        String CurrentReward = ArrayOfGiveaways.get(i).get("Reward").toString();
+                        String CurrentWinnersAmount = ArrayOfGiveaways.get(i).get("WinnersAmount").toString();
+
+
+                        ArrayOfActiveGiveaways.add(":gift: **" + CurrentReward + "**" + " | <#" + e.getGuild().getTextChannelById(CurrentChannelID).getId() + ">" + " | " + "[Click-to-View](https://discordapp.com/channels/" + CurrentGuildID + "/" + CurrentChannelID + "/" + CurrentMessageID + ")");
+                    }
+                }
+                if (ArrayOfActiveGiveaways.size() == 0) {
+                    EmbedList.addField("Active Giveaways:", "`There are no active giveaways!`", true);
+                    e.getChannel().sendMessage(EmbedList.build()).queue();
+                } else {
+                    String ActiveGiveawaysString = "";
+                    for (int k = 0; k < ArrayOfActiveGiveaways.size(); k++) {
+                        ActiveGiveawaysString = ActiveGiveawaysString + ArrayOfActiveGiveaways.get(k) + "\n";
+                    }
+                    EmbedList.addField("Active Giveaways:", ActiveGiveawaysString, true);
+                    e.getChannel().sendMessage(EmbedList.build()).queue();
+                }
             } else {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
                 EmbedRules.setTitle("Insufficient Permissions");
@@ -189,7 +151,6 @@ public class Extra_StaffClear extends ListenerAdapter {
                 channel.sendMessage(EmbedRules.build()).queue(message1 -> {
                     e.getMessage().delete().queue();
                 });
-
             }
         }
 

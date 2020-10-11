@@ -52,7 +52,7 @@ public class Ticket_Rename extends ListenerAdapter {
             BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
             BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
             ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
-TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
+            TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
             TicketCreateCategoryChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateCategoryChannelID");
 
             MemberRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("MemberRoleID");
@@ -69,7 +69,30 @@ TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("
         Role supportRole = e.getGuild().getRoleById(SupportTeamRoleID);
         String[] messageWithSplit = e.getMessage().getContentRaw().split(" ");
         if (messageWithSplit.length > 0 && messageWithSplit[0].equalsIgnoreCase(Bot.BotPrefix + "rename")) {
-            ArrayList<String> BlacklistedGet = new ArrayList<>(); if (new File("BlacklistedUsers.json").exists()) { try { JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json"))); BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers"); } catch (Exception ee) { ee.printStackTrace(); } } boolean isBlacklisted = false; for (String s : BlacklistedGet) { if (e.getAuthor().getId().equals(s)) { isBlacklisted = true; } } if (isBlacklisted) { EmbedBuilder UserBlacklisted = new EmbedBuilder() .setTitle("Error") .setThumbnail(Bot.BotLogo) .setFooter(Bot.WaterMark, Bot.BotLogo) .setTimestamp(Bot.now) .setColor(Color.RED) .setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*"); e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> { e.getMessage().delete().queue(); message3.addReaction("❌").queue(); message3.delete().queueAfter(10, TimeUnit.SECONDS); }); return; }
+            ArrayList<String> BlacklistedGet = new ArrayList<>();
+            if (new File("BlacklistedUsers.json").exists()) {
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                    BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+            }
+            boolean isBlacklisted = false;
+            for (String s : BlacklistedGet) {
+                if (e.getAuthor().getId().equals(s)) {
+                    isBlacklisted = true;
+                }
+            }
+            if (isBlacklisted) {
+                EmbedBuilder UserBlacklisted = new EmbedBuilder().setTitle("Error").setThumbnail(Bot.BotLogo).setFooter(Bot.WaterMark, Bot.BotLogo).setTimestamp(Bot.now).setColor(Color.RED).setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*");
+                e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> {
+                    e.getMessage().delete().queue();
+                    message3.addReaction("❌").queue();
+                    message3.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
         }
         if (new File("Tickets/Storage/" + e.getChannel().getId() + ".json").exists()) {
 
@@ -79,121 +102,122 @@ TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("
             } catch (Exception ee) {
                 ee.printStackTrace();
             }
-        }
-
-        if (messageWithSplit[0].equalsIgnoreCase(BotPrefix + "rename") && ChannelID.length() < 9) {
-
-            EmbedBuilder EmbedRules = new EmbedBuilder();
-
-            EmbedRules.setTitle("Error");
-            EmbedRules.setDescription("You can only use this command in a ticket");
-
-            EmbedRules.setColor(Color);
-            EmbedRules.setTimestamp(LocalTime);
-            EmbedRules.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
-            channel.sendMessage(EmbedRules.build()).queue(message1 -> {
-                e.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
-            });
-
-        } else {
 
 
-            if (messageWithSplit.length == 1 && messageWithSplit[0].equalsIgnoreCase(BotPrefix + "rename")) {
-                EmbedBuilder Embed = new EmbedBuilder();
-                Embed.setTitle("Incorrect Format");
-                Embed.addField("Format:", "**" + BotPrefix + "rename [name]**", false);
-                Embed.setColor(Color);
-                Embed.setTimestamp(LocalTime);
-                Embed.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
-                channel.sendMessage(Embed.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
-                });
-            }
-            if (messageWithSplit.length > 1 && messageWithSplit[0].equalsIgnoreCase(BotPrefix + "rename")) {
-                try {
-                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/Storage/" + e.getChannel().getId() + ".json")));
-                    ChannelID = (String) json.get("ChannelID");
-                    ChannelName = (String) json.get("ChannelName");
-                    CategoryID = (String) json.get("CategoryID");
-                    UsersID = (String) json.get("UsersID");
-                    UsersTag = (String) json.get("UsersTag");
-                    UsersAvatarURL = (String) json.get("UsersAvatarURL");
-                    AdminOnlyMode = (boolean) json.get("AdminOnlyMode");
-                    SubUsers = (ArrayList<String>) json.get("SubUsers");
-
-                } catch (Exception ee) {
-                    ee.printStackTrace();
-                }
-                String newTicketName = "";
-
-
-                for (int i = 1; i < messageWithSplit.length; i++) {
-                    newTicketName += messageWithSplit[i] + "-";
-                }
-                newTicketName = newTicketName.substring(0, newTicketName.length() - 1);
-
-                String oldChannelName = channel.getName();
-                String ticketID = oldChannelName;
-                String IDNUMBER = "";
-                String TicketNameNoNum = "";
-                for (int k = 0; k < oldChannelName.length(); k++) {
-                    char Char = oldChannelName.charAt(k);
-                    String SChar = Char + "";
-                    ArrayList myIntArray = new ArrayList();
-                    myIntArray.add("0");
-                    myIntArray.add("1");
-                    myIntArray.add("2");
-                    myIntArray.add("3");
-                    myIntArray.add("4");
-                    myIntArray.add("5");
-                    myIntArray.add("6");
-                    myIntArray.add("7");
-                    myIntArray.add("8");
-                    myIntArray.add("9");
-
-                    if (myIntArray.contains(SChar)) {
-                        IDNUMBER = IDNUMBER + SChar;
-                    } else {
-                        TicketNameNoNum = TicketNameNoNum + SChar;
-                    }
-                }
-
-                String FinalTicketOutPut = newTicketName + "-" + IDNUMBER;
-                FinalTicketOutPut = FinalTicketOutPut.toLowerCase();
+            if (messageWithSplit[0].equalsIgnoreCase(BotPrefix + "rename") && ChannelID.length() < 9) {
 
                 EmbedBuilder EmbedRules = new EmbedBuilder();
-                EmbedRules.setTitle("Ticket Rename");
+
+                EmbedRules.setTitle("Error");
+                EmbedRules.setDescription("You can only use this command in a ticket");
+
                 EmbedRules.setColor(Color);
-                EmbedRules.setThumbnail(UsersAvatarURL);
-                EmbedRules.addField("Ticket ID:",
-                        "**" + e.getChannel().getName() + " was changed to " + FinalTicketOutPut + "**",
-                        false);
                 EmbedRules.setTimestamp(LocalTime);
-                EmbedRules.setFooter("Changed By " + e.getAuthor().getAsTag(), e.getMember().getUser().getAvatarUrl());
+                EmbedRules.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
                 channel.sendMessage(EmbedRules.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
+                    e.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
                 });
-                e.getChannel().getManager().setName(FinalTicketOutPut).queue();
 
-                JSONObject all = new JSONObject();
-                all.put("ChannelID", ChannelID);
-                all.put("ChannelName", FinalTicketOutPut);
-                all.put("CategoryID", CategoryID);
-                all.put("UsersID", UsersID);
-                all.put("UsersTag", UsersTag);
-                all.put("UsersAvatarURL", UsersAvatarURL);
-                all.put("AdminOnlyMode", AdminOnlyMode);
-                all.put("SubUsers", SubUsers);
+            } else {
 
 
-                try {
-                    Files.write(Paths.get("Tickets/Storage/" + ChannelID + ".json"), all.toJSONString().getBytes());
-                } catch (Exception ef) {
-                    ef.printStackTrace();
+                if (messageWithSplit.length == 1 && messageWithSplit[0].equalsIgnoreCase(BotPrefix + "rename")) {
+                    EmbedBuilder Embed = new EmbedBuilder();
+                    Embed.setTitle("Incorrect Format");
+                    Embed.addField("Format:", "**" + BotPrefix + "rename [name]**", false);
+                    Embed.setColor(Color);
+                    Embed.setTimestamp(LocalTime);
+                    Embed.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
+                    channel.sendMessage(Embed.build()).queue(message1 -> {
+                        e.getMessage().delete().queue();
+                    });
                 }
+                if (messageWithSplit.length > 1 && messageWithSplit[0].equalsIgnoreCase(BotPrefix + "rename")) {
+                    try {
+                        JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/Storage/" + e.getChannel().getId() + ".json")));
+                        ChannelID = (String) json.get("ChannelID");
+                        ChannelName = (String) json.get("ChannelName");
+                        CategoryID = (String) json.get("CategoryID");
+                        UsersID = (String) json.get("UsersID");
+                        UsersTag = (String) json.get("UsersTag");
+                        UsersAvatarURL = (String) json.get("UsersAvatarURL");
+                        AdminOnlyMode = (boolean) json.get("AdminOnlyMode");
+                        SubUsers = (ArrayList<String>) json.get("SubUsers");
 
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                    String newTicketName = "";
+
+
+                    for (int i = 1; i < messageWithSplit.length; i++) {
+                        newTicketName += messageWithSplit[i] + "-";
+                    }
+                    newTicketName = newTicketName.substring(0, newTicketName.length() - 1);
+
+                    String oldChannelName = channel.getName();
+                    String ticketID = oldChannelName;
+                    String IDNUMBER = "";
+                    String TicketNameNoNum = "";
+                    for (int k = 0; k < oldChannelName.length(); k++) {
+                        char Char = oldChannelName.charAt(k);
+                        String SChar = Char + "";
+                        ArrayList myIntArray = new ArrayList();
+                        myIntArray.add("0");
+                        myIntArray.add("1");
+                        myIntArray.add("2");
+                        myIntArray.add("3");
+                        myIntArray.add("4");
+                        myIntArray.add("5");
+                        myIntArray.add("6");
+                        myIntArray.add("7");
+                        myIntArray.add("8");
+                        myIntArray.add("9");
+
+                        if (myIntArray.contains(SChar)) {
+                            IDNUMBER = IDNUMBER + SChar;
+                        } else {
+                            TicketNameNoNum = TicketNameNoNum + SChar;
+                        }
+                    }
+
+                    String FinalTicketOutPut = newTicketName + "-" + IDNUMBER;
+                    FinalTicketOutPut = FinalTicketOutPut.toLowerCase();
+
+                    EmbedBuilder EmbedRules = new EmbedBuilder();
+                    EmbedRules.setTitle("Ticket Rename");
+                    EmbedRules.setColor(Color);
+                    EmbedRules.setThumbnail(UsersAvatarURL);
+                    EmbedRules.addField("Ticket ID:",
+                            "**" + e.getChannel().getName() + " was changed to " + FinalTicketOutPut + "**",
+                            false);
+                    EmbedRules.setTimestamp(LocalTime);
+                    EmbedRules.setFooter("Changed By " + e.getAuthor().getAsTag(), e.getMember().getUser().getAvatarUrl());
+                    channel.sendMessage(EmbedRules.build()).queue(message1 -> {
+                        e.getMessage().delete().queue();
+                    });
+                    e.getChannel().getManager().setName(FinalTicketOutPut).queue();
+
+                    JSONObject all = new JSONObject();
+                    all.put("ChannelID", ChannelID);
+                    all.put("ChannelName", FinalTicketOutPut);
+                    all.put("CategoryID", CategoryID);
+                    all.put("UsersID", UsersID);
+                    all.put("UsersTag", UsersTag);
+                    all.put("UsersAvatarURL", UsersAvatarURL);
+                    all.put("AdminOnlyMode", AdminOnlyMode);
+                    all.put("SubUsers", SubUsers);
+
+
+                    try {
+                        Files.write(Paths.get("Tickets/Storage/" + ChannelID + ".json"), all.toJSONString().getBytes());
+                    } catch (Exception ef) {
+                        ef.printStackTrace();
+                    }
+
+                }
             }
-        }
 
+        }
     }
 }

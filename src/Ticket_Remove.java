@@ -47,7 +47,30 @@ public class Ticket_Remove extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
         String[] messageWithSplit = e.getMessage().getContentRaw().split(" ");
         if (messageWithSplit.length > 0 && messageWithSplit[0].equalsIgnoreCase(Bot.BotPrefix + "remove")) {
-            ArrayList<String> BlacklistedGet = new ArrayList<>(); if (new File("BlacklistedUsers.json").exists()) { try { JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json"))); BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers"); } catch (Exception ee) { ee.printStackTrace(); } } boolean isBlacklisted = false; for (String s : BlacklistedGet) { if (e.getAuthor().getId().equals(s)) { isBlacklisted = true; } } if (isBlacklisted) { EmbedBuilder UserBlacklisted = new EmbedBuilder() .setTitle("Error") .setThumbnail(Bot.BotLogo) .setFooter(Bot.WaterMark, Bot.BotLogo) .setTimestamp(Bot.now) .setColor(Color.RED) .setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*"); e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> { e.getMessage().delete().queue(); message3.addReaction("❌").queue(); message3.delete().queueAfter(10, TimeUnit.SECONDS); }); return; }
+            ArrayList<String> BlacklistedGet = new ArrayList<>();
+            if (new File("BlacklistedUsers.json").exists()) {
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("BlacklistedUsers.json")));
+                    BlacklistedGet = (ArrayList<String>) json.get("BlacklistedUsers");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+            }
+            boolean isBlacklisted = false;
+            for (String s : BlacklistedGet) {
+                if (e.getAuthor().getId().equals(s)) {
+                    isBlacklisted = true;
+                }
+            }
+            if (isBlacklisted) {
+                EmbedBuilder UserBlacklisted = new EmbedBuilder().setTitle("Error").setThumbnail(Bot.BotLogo).setFooter(Bot.WaterMark, Bot.BotLogo).setTimestamp(Bot.now).setColor(Color.RED).setDescription("**" + e.getAuthor().getAsTag() + "**, *You are blacklisted from using all commands, \n" + "If you think this is an error please contact a staff member!*");
+                e.getChannel().sendMessage(UserBlacklisted.build()).queue(message3 -> {
+                    e.getMessage().delete().queue();
+                    message3.addReaction("❌").queue();
+                    message3.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
+                return;
+            }
         }
         try {
             JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/config.json")));
@@ -55,7 +78,7 @@ public class Ticket_Remove extends ListenerAdapter {
             BotName = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotName");
             BotLogo = ((HashMap<String, String>) json.get("GeneralConfig")).get("BotLogo");
             ColorHexCode = ((HashMap<String, String>) json.get("GeneralConfig")).get("ColorHexCode");
-TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
+            TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateChannelID");
             TicketCreateCategoryChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("TicketCreateCategoryChannelID");
 
             MemberRoleID = ((HashMap<String, String>) json.get("RoleIDS")).get("MemberRoleID");
@@ -79,128 +102,129 @@ TicketCreateChannelID = ((HashMap<String, String>) json.get("ChannelIDS")).get("
             } catch (Exception ee) {
                 ee.printStackTrace();
             }
-        }
-
-        if (messageWithSplit[0].equalsIgnoreCase(BotPrefix + "remove") && ChannelID.length() < 9) {
-
-            EmbedBuilder EmbedRules = new EmbedBuilder();
-
-            EmbedRules.setTitle("Error");
-            EmbedRules.setDescription("You can only use this command in a ticket");
-
-            EmbedRules.setColor(Color);
-            EmbedRules.setTimestamp(LocalTime);
-            EmbedRules.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
-            channel.sendMessage(EmbedRules.build()).queue(message1 -> {
-                e.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
-            });
-
-        } else {
 
 
-            if (messageWithSplit.length == 1 && messageWithSplit[0].equalsIgnoreCase(BotPrefix + "remove")) {
-                EmbedBuilder Embed = new EmbedBuilder();
-                Embed.setTitle("Incorrect Format");
-                Embed.addField("Format:", "**" + BotPrefix + "remove [@user]**", false);
-                Embed.setColor(Color);
-                Embed.setTimestamp(LocalTime);
-                Embed.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
-                channel.sendMessage(Embed.build()).queue(message1 -> {
-                    e.getMessage().delete().queue();
+            if (messageWithSplit[0].equalsIgnoreCase(BotPrefix + "remove") && ChannelID.length() < 9) {
+
+                EmbedBuilder EmbedRules = new EmbedBuilder();
+
+                EmbedRules.setTitle("Error");
+                EmbedRules.setDescription("You can only use this command in a ticket");
+
+                EmbedRules.setColor(Color);
+                EmbedRules.setTimestamp(LocalTime);
+                EmbedRules.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
+                channel.sendMessage(EmbedRules.build()).queue(message1 -> {
+                    e.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
                 });
-            }
-            if (messageWithSplit.length > 1 && messageWithSplit[0].equalsIgnoreCase(BotPrefix + "remove")) {
-                try {
-                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/Storage/" + e.getChannel().getId() + ".json")));
-                    ChannelID = (String) json.get("ChannelID");
-                    ChannelName = (String) json.get("ChannelName");
-                    CategoryID = (String) json.get("CategoryID");
-                    UsersID = (String) json.get("UsersID");
-                    UsersTag = (String) json.get("UsersTag");
-                    UsersAvatarURL = (String) json.get("UsersAvatarURL");
-                    AdminOnlyMode = (boolean) json.get("AdminOnlyMode");
-                    SubUsers = (ArrayList<String>) json.get("SubUsers");
 
-                } catch (Exception ee) {
-                    ee.printStackTrace();
-                }
-
-                User RemovedUser = e.getMessage().getMentionedUsers().get(0);
-                Member RemovedMember = e.getMessage().getMentionedMembers().get(0);
+            } else {
 
 
-                boolean AlreadyRemoved = true;
-                if (SubUsers.contains(RemovedMember.getId())) {
-                    AlreadyRemoved = false;
-                }
-                boolean isBot = false;
-                if (RemovedUser.isBot()) {
-                    isBot = true;
-                }
-
-
-                if (AlreadyRemoved) {
+                if (messageWithSplit.length == 1 && messageWithSplit[0].equalsIgnoreCase(BotPrefix + "remove")) {
                     EmbedBuilder Embed = new EmbedBuilder();
-                    Embed.setTitle("Ticket Sub-User Addition");
-                    Embed.addField("Ticket: " + ChannelName, "Cannot remove " + RemovedUser.getAsTag() + " because they are not in this ticket!", false);
+                    Embed.setTitle("Incorrect Format");
+                    Embed.addField("Format:", "**" + BotPrefix + "remove [@user]**", false);
                     Embed.setColor(Color);
                     Embed.setTimestamp(LocalTime);
                     Embed.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
                     channel.sendMessage(Embed.build()).queue(message1 -> {
                         e.getMessage().delete().queue();
                     });
-                } else {
-                    if (isBot) {
+                }
+                if (messageWithSplit.length > 1 && messageWithSplit[0].equalsIgnoreCase(BotPrefix + "remove")) {
+                    try {
+                        JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Tickets/Storage/" + e.getChannel().getId() + ".json")));
+                        ChannelID = (String) json.get("ChannelID");
+                        ChannelName = (String) json.get("ChannelName");
+                        CategoryID = (String) json.get("CategoryID");
+                        UsersID = (String) json.get("UsersID");
+                        UsersTag = (String) json.get("UsersTag");
+                        UsersAvatarURL = (String) json.get("UsersAvatarURL");
+                        AdminOnlyMode = (boolean) json.get("AdminOnlyMode");
+                        SubUsers = (ArrayList<String>) json.get("SubUsers");
+
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+
+                    User RemovedUser = e.getMessage().getMentionedUsers().get(0);
+                    Member RemovedMember = e.getMessage().getMentionedMembers().get(0);
+
+
+                    boolean AlreadyRemoved = true;
+                    if (SubUsers.contains(RemovedMember.getId())) {
+                        AlreadyRemoved = false;
+                    }
+                    boolean isBot = false;
+                    if (RemovedUser.isBot()) {
+                        isBot = true;
+                    }
+
+
+                    if (AlreadyRemoved) {
                         EmbedBuilder Embed = new EmbedBuilder();
                         Embed.setTitle("Ticket Sub-User Addition");
-                        Embed.addField("Ticket: " + ChannelName, "You cannot add " + RemovedUser.getAsTag() + ", because they are a bot!", false);
+                        Embed.addField("Ticket: " + ChannelName, "Cannot remove " + RemovedUser.getAsTag() + " because they are not in this ticket!", false);
                         Embed.setColor(Color);
                         Embed.setTimestamp(LocalTime);
                         Embed.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
-                        channel.sendMessage(Embed.build()).queue();
-                    } else {
-
-                        e.getChannel().putPermissionOverride(RemovedMember)
-                                .setDeny(Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES,
-                                        Permission.MESSAGE_EXT_EMOJI, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY,
-                                        Permission.MESSAGE_ADD_REACTION, Permission.CREATE_INSTANT_INVITE,
-                                        Permission.MESSAGE_MENTION_EVERYONE, Permission.MESSAGE_MANAGE, Permission.MESSAGE_TTS,
-                                        Permission.MANAGE_WEBHOOKS, Permission.MANAGE_PERMISSIONS, Permission.MANAGE_CHANNEL)
-                                .queue();
-
-
-                        EmbedBuilder EmbedRules = new EmbedBuilder();
-                        EmbedRules.setTitle("Ticket Sub-User Removal");
-                        EmbedRules.setColor(Color);
-                        EmbedRules.setThumbnail(UsersAvatarURL);
-                        EmbedRules.addField("Ticket: " + ChannelName, "The user " + RemovedUser.getAsTag() + " has been removed from the ticket", false);
-                        EmbedRules.setTimestamp(LocalTime);
-                        EmbedRules.setFooter("Removed By " + e.getAuthor().getAsTag(), e.getMember().getUser().getAvatarUrl());
-                        channel.sendMessage(EmbedRules.build()).queue(message1 -> {
+                        channel.sendMessage(Embed.build()).queue(message1 -> {
                             e.getMessage().delete().queue();
                         });
+                    } else {
+                        if (isBot) {
+                            EmbedBuilder Embed = new EmbedBuilder();
+                            Embed.setTitle("Ticket Sub-User Addition");
+                            Embed.addField("Ticket: " + ChannelName, "You cannot add " + RemovedUser.getAsTag() + ", because they are a bot!", false);
+                            Embed.setColor(Color);
+                            Embed.setTimestamp(LocalTime);
+                            Embed.setFooter("Request From " + e.getAuthor().getAsTag(), BotLogo);
+                            channel.sendMessage(Embed.build()).queue();
+                        } else {
 
-                        SubUsers.remove(RemovedMember.getId());
+                            e.getChannel().putPermissionOverride(RemovedMember)
+                                    .setDeny(Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES,
+                                            Permission.MESSAGE_EXT_EMOJI, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY,
+                                            Permission.MESSAGE_ADD_REACTION, Permission.CREATE_INSTANT_INVITE,
+                                            Permission.MESSAGE_MENTION_EVERYONE, Permission.MESSAGE_MANAGE, Permission.MESSAGE_TTS,
+                                            Permission.MANAGE_WEBHOOKS, Permission.MANAGE_PERMISSIONS, Permission.MANAGE_CHANNEL)
+                                    .queue();
 
 
-                        JSONObject all = new JSONObject();
-                        all.put("ChannelID", ChannelID);
-                        all.put("ChannelName", ChannelName);
-                        all.put("CategoryID", CategoryID);
-                        all.put("UsersID", UsersID);
-                        all.put("UsersTag", UsersTag);
-                        all.put("UsersAvatarURL", UsersAvatarURL);
-                        all.put("AdminOnlyMode", AdminOnlyMode);
-                        all.put("SubUsers", SubUsers);
+                            EmbedBuilder EmbedRules = new EmbedBuilder();
+                            EmbedRules.setTitle("Ticket Sub-User Removal");
+                            EmbedRules.setColor(Color);
+                            EmbedRules.setThumbnail(UsersAvatarURL);
+                            EmbedRules.addField("Ticket: " + ChannelName, "The user " + RemovedUser.getAsTag() + " has been removed from the ticket", false);
+                            EmbedRules.setTimestamp(LocalTime);
+                            EmbedRules.setFooter("Removed By " + e.getAuthor().getAsTag(), e.getMember().getUser().getAvatarUrl());
+                            channel.sendMessage(EmbedRules.build()).queue(message1 -> {
+                                e.getMessage().delete().queue();
+                            });
+
+                            SubUsers.remove(RemovedMember.getId());
 
 
-                        try {
-                            Files.write(Paths.get("Tickets/Storage/" + ChannelID + ".json"), all.toJSONString().getBytes());
-                        } catch (Exception ef) {
-                            ef.printStackTrace();
+                            JSONObject all = new JSONObject();
+                            all.put("ChannelID", ChannelID);
+                            all.put("ChannelName", ChannelName);
+                            all.put("CategoryID", CategoryID);
+                            all.put("UsersID", UsersID);
+                            all.put("UsersTag", UsersTag);
+                            all.put("UsersAvatarURL", UsersAvatarURL);
+                            all.put("AdminOnlyMode", AdminOnlyMode);
+                            all.put("SubUsers", SubUsers);
+
+
+                            try {
+                                Files.write(Paths.get("Tickets/Storage/" + ChannelID + ".json"), all.toJSONString().getBytes());
+                            } catch (Exception ef) {
+                                ef.printStackTrace();
+                            }
+                            SubUsers.clear();
+
                         }
-                        SubUsers.clear();
-
                     }
                 }
             }

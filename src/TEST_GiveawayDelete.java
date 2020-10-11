@@ -9,13 +9,16 @@ import org.json.simple.parser.JSONParser;
 import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
-public class Extra_StaffClear extends ListenerAdapter {
+public class TEST_GiveawayDelete extends ListenerAdapter {
     public String BotPrefix = Bot.BotPrefix;
     public String BotName = Bot.BotName;
     public ZonedDateTime LocalTime = ZonedDateTime.now();
@@ -61,7 +64,7 @@ public class Extra_StaffClear extends ListenerAdapter {
         Color Color = java.awt.Color.decode(ColorHexCode);
         MessageChannel channel = e.getChannel();
         String[] message = e.getMessage().getContentRaw().split(" ");
-        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "staffclear")) {
+        if (message.length > 0 && message[0].equalsIgnoreCase(Bot.BotPrefix + "gdelete")) {
             ArrayList<String> BlacklistedGet = new ArrayList<>();
             if (new File("BlacklistedUsers.json").exists()) {
                 try {
@@ -87,18 +90,19 @@ public class Extra_StaffClear extends ListenerAdapter {
                 return;
             }
         }
+
         boolean isAllowed = false;
         for (int i = 0; i < Bot.AllowedRoles.size(); i++) {
             if (e.getMember().getRoles().contains(e.getGuild().getRoleById(Bot.AllowedRoles.get(i))) || e.getMember().getPermissions().contains(Permission.ADMINISTRATOR)) {
                 isAllowed = true;
             }
         }
-        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "StaffClear")) {
+        if (message.length == 1 && message[0].equalsIgnoreCase(Bot.BotPrefix + "gdelete")) {
             if (isAllowed) {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
                 EmbedRules.setTitle("Incorrect Format");
                 EmbedRules.setColor(Color);
-                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "StaffClear [@User] <-s>", false);
+                EmbedRules.addField("Format:", "" + Bot.BotPrefix + "gdelete [Message ID]", false);
                 EmbedRules.setTimestamp(now);
                 EmbedRules.setFooter(Bot.WaterMark, BotLogo);
                 channel.sendMessage(EmbedRules.build()).queue(message1 -> {
@@ -117,67 +121,87 @@ public class Extra_StaffClear extends ListenerAdapter {
             }
         }
 
-        if ((message.length == 2 || message.length == 3) && message[0].equalsIgnoreCase(Bot.BotPrefix + "StaffClear")) {
+        if ((message.length == 2) && message[0].equalsIgnoreCase(Bot.BotPrefix + "gdelete")) {
             if (isAllowed) {
-                if (e.getMessage().getContentRaw().contains(" -s")) {
 
-
-                    User MentionedUser = e.getMessage().getMentionedUsers().get(0);
-                    Member MentionedMember = e.getMessage().getMentionedMembers().get(0);
-
-
-                    for (int i = 0; i < StaffRoleIDS.size(); i++) {
-
-                        if (MentionedMember.getRoles().contains(e.getGuild().getRoleById(StaffRoleIDS.get(i)))) {
-                            e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i))).queue();
+                ArrayList<JSONObject> ArrayOfGiveaways = new ArrayList<>();
+                try {
+                    JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(new File("Giveaways.json")));
+                    ArrayOfGiveaways = (ArrayList<JSONObject>) json.get("Giveaways");
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+                boolean GiveawayExists = false;
+                boolean GiveawayEnded = false;
+                String MessageID = message[1];
+                JSONObject CurrentGiveaway = new JSONObject();
+                for (int i = 0; i < ArrayOfGiveaways.size(); i++) {
+                    if (ArrayOfGiveaways.get(i).get("MessageID").toString().equalsIgnoreCase(MessageID)) {
+                        GiveawayExists = true;
+                        CurrentGiveaway = ArrayOfGiveaways.get(i);
+                        if ((boolean) ArrayOfGiveaways.get(i).get("GiveawayEnded")) {
+                            GiveawayEnded = true;
                         }
                     }
-                    e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
 
+                    if (GiveawayExists && !GiveawayEnded) {
+                        ArrayOfGiveaways.remove(i);
+                    }
 
+                }
+
+                if (!GiveawayExists) {
                     EmbedBuilder EmbedFirst = new EmbedBuilder()
-                            .setTitle("Successfully Removed " + MentionedUser.getAsTag())
-                            .setColor(Color)
-                            .addField("Success", e.getMember().getUser().getAsTag() + ", you have  __*Silently*__ Removed " + MentionedMember.getUser().getAsTag(), false)
+                            .setTitle(BotName + " Giveaways")
+                            .setColor(java.awt.Color.RED)
+                            .addField("Error", "**" + e.getMember().getUser().getAsTag() + "**, That giveaway cannot be found!", false)
                             .setTimestamp(now)
                             .setFooter(Bot.WaterMark, BotLogo);
                     channel.sendMessage(EmbedFirst.build()).queue(message1 -> {
                         e.getMessage().delete().queue();
                     });
-
                 } else {
+                    if (GiveawayEnded) {
+                        EmbedBuilder EmbedFirst = new EmbedBuilder()
+                                .setTitle(BotName + " Giveaways")
+                                .setColor(java.awt.Color.RED)
+                                .addField("Error", "**" + e.getMember().getUser().getAsTag() + "**, That giveaway is not running! You can only delete on-going giveaways!", false)
+                                .setTimestamp(now)
+                                .setFooter(Bot.WaterMark, BotLogo);
+                        channel.sendMessage(EmbedFirst.build()).queue(message1 -> {
+                            e.getMessage().delete().queue();
+                        });
+                    } else {
 
-                    User MentionedUser = e.getMessage().getMentionedUsers().get(0);
-                    Member MentionedMember = e.getMessage().getMentionedMembers().get(0);
+                        EmbedBuilder EmbedFirst = new EmbedBuilder()
+                                .setTitle(BotName + " Giveaways")
+                                .setColor(Color)
+                                .addField("Success", "**" + e.getMember().getUser().getAsTag() + "**, You deleted that giveaway completely", false)
+                                .setTimestamp(now)
+                                .setFooter(Bot.WaterMark, BotLogo);
+                        channel.sendMessage(EmbedFirst.build()).queue(message1 -> {
+                            e.getMessage().delete().queue();
+                        });
 
 
-                    for (int i = 0; i < StaffRoleIDS.size(); i++) {
+                        String CurrentChannelID = CurrentGiveaway.get("ChannelID").toString();
+                        String CurrentMessageID = CurrentGiveaway.get("MessageID").toString();
+                        String CurrentGuildID = CurrentGiveaway.get("GuildID").toString();
+                        Bot.jda.getGuildById(CurrentGuildID).getTextChannelById(CurrentChannelID).deleteMessageById(MessageID).queue();
 
-                        if (MentionedMember.getRoles().contains(e.getGuild().getRoleById(StaffRoleIDS.get(i)))) {
-                            e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(StaffRoleIDS.get(i))).queue();
+                        JSONObject all = new JSONObject();
+                        all.put("Giveaways", ArrayOfGiveaways);
+
+                        try {
+                            Files.write(Paths.get("Giveaways.json"), all.toJSONString().getBytes());
+                        } catch (Exception ef) {
+                            ef.printStackTrace();
                         }
+
                     }
-                    e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
 
-
-                    EmbedBuilder EmbedFirst = new EmbedBuilder()
-                            .setTitle("Successfully Removed " + MentionedUser.getAsTag())
-                            .setColor(Color)
-                            .addField("Success", e.getMember().getUser().getAsTag() + ", you have Removed " + MentionedMember.getUser().getAsTag(), false)
-                            .setTimestamp(now)
-                            .setFooter(Bot.WaterMark, BotLogo);
-                    channel.sendMessage(EmbedFirst.build()).queue();
-
-                    EmbedBuilder Embed = new EmbedBuilder()
-                            .setTitle("Staff Movement")
-                            .setColor(Color)
-                            .addField("Remove", "**" + MentionedMember.getUser().getAsTag() + "**" + " has been Removed by " + "**" + e.getAuthor().getAsTag() + "**", false)
-                            .setTimestamp(now)
-                            .setFooter(Bot.WaterMark, BotLogo);
-                    e.getGuild().getTextChannelById(StaffMovementsChannelID).sendMessage(Embed.build()).queue(message1 -> {
-                        e.getMessage().delete().queue();
-                    });
                 }
+
 
             } else {
                 EmbedBuilder EmbedRules = new EmbedBuilder();
@@ -189,7 +213,6 @@ public class Extra_StaffClear extends ListenerAdapter {
                 channel.sendMessage(EmbedRules.build()).queue(message1 -> {
                     e.getMessage().delete().queue();
                 });
-
             }
         }
 

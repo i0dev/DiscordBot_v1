@@ -98,7 +98,7 @@ public class Command_Say extends ListenerAdapter {
                     announcementString = announcementString + message[k] + " ";
                 }
                 EmbedBuilder announcement = new EmbedBuilder()
-                        .setTitle("New Announcement!")
+                        .setTitle("Announcement")
                         .setColor(Color)
                         .setDescription(announcementString)
                         .setTimestamp(Bot.now)

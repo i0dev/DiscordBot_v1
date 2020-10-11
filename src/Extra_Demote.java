@@ -172,7 +172,7 @@ public class Extra_Demote extends ListenerAdapter {
                         e.getGuild().removeRoleFromMember(MentionedMember, e.getGuild().getRoleById(SupportTeamRoleID)).queue();
 
                         EmbedBuilder Embed = new EmbedBuilder()
-                                .setTitle("Incoming Staff Movement!")
+                                .setTitle("Staff Movement")
                                 .setColor(Color)
                                 .addField("Demotion", MentionedMember.getUser().getAsTag() + " has been **Fully** demoted by **" + e.getMember().getUser().getAsTag() + "**", false)
                                 .setTimestamp(now)
